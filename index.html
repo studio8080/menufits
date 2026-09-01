@@ -153,6 +153,9 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
 .btn:hover{background:#f5f4ef;border-color:rgba(28,25,18,.22);transform:translateY(-1px);
   box-shadow:0 1px 2px rgba(28,25,18,.05),0 6px 14px rgba(28,25,18,.07)}
 .btn:active{transform:translateY(0)}
+.btn:disabled{opacity:.38;cursor:default;pointer-events:none}
+.histrow{margin:0 0 22px}
+.histrow .btn{padding:8px 10px;font-size:12.5px}
 .btn.primary{background:var(--ui-acc);color:#f7f5f0;border-color:var(--ui-acc);font-weight:600;letter-spacing:.08em}
 .btn.primary:hover{background:#2b2822;box-shadow:0 2px 4px rgba(28,25,18,.15),0 10px 24px rgba(28,25,18,.18)}
 .hintbox{font-size:12px;line-height:1.85;color:var(--ui-mut);background:rgba(28,25,18,.035);border:1px solid rgba(28,25,18,.05);border-radius:8px;padding:12px 13px}
@@ -1105,6 +1108,11 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
     <h1 style="display:flex;align-items:center;gap:8px"><span class="lplogo" style="width:26px;height:26px;font-size:15px;border-radius:7px">M</span>MenuFits</h1>
     <div class="sub">飲食店メニュー ／ A4・登録不要・ブラウザで完結</div>
 
+    <div class="row histrow">
+      <button class="btn" id="undoBtn" disabled title="元に戻す（Ctrl+Z）">↩ 元に戻す</button>
+      <button class="btn" id="redoBtn" disabled title="やり直す（Ctrl+Shift+Z）">やり直す ↪</button>
+    </div>
+
     <div class="grp">
       <span class="lb">01 ＿ デザインを選ぶ</span>
       <div class="designs" id="designs"></div>
@@ -1327,7 +1335,8 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
     <div class="hintbox">
       紙の上の文字は <b>クリックしてそのまま書き換え</b> られます。<br>
       項目やカテゴリーに <b>マウスを乗せる</b> と、追加・並べ替え・削除のボタンが出ます。<br>
-      内容は自動でこのブラウザに保存されます。
+      内容は自動でこのブラウザに保存されます。<br>
+      操作を間違えたら <b>Ctrl+Z</b>（元に戻す）。
     </div>
   </aside>
 
@@ -1617,7 +1626,67 @@ const save = ()=>{
   catch(e){
     if(!saveFailed){ saveFailed=true; toast('保存容量の上限に達し、自動保存が止まっています。「ファイルに保存（.json）」で控えを取ってください。'); }
   }
+  if(!applyingHistory) scheduleCommit();
 };
+
+/* ---------------- undo / redo ----------------
+   Every mutation already funnels through save(), so history hooks there rather than
+   at ~60 call sites. A commit stores the state as it was BEFORE the change, and is
+   debounced so a burst of typing or a slider drag collapses into one undoable step. */
+const HIST_MAX=40, HIST_BYTES=24*1024*1024;
+let undoStack=[], redoStack=[], histBase=JSON.stringify(state), histTimer=null, applyingHistory=false;
+function trimHistory(){
+  while(undoStack.length>HIST_MAX) undoStack.shift();
+  // snapshots embed base64 images, so bound the stack by bytes too, not just count
+  let bytes=undoStack.reduce((n,s)=>n+s.length,0);
+  while(undoStack.length>1 && bytes>HIST_BYTES){ bytes-=undoStack.shift().length; }
+}
+function commitHistory(){
+  histTimer=null;
+  const now=JSON.stringify(state);
+  if(now===histBase) return;
+  undoStack.push(histBase);
+  histBase=now;
+  redoStack.length=0;
+  trimHistory(); syncHistoryUI();
+}
+function scheduleCommit(){ clearTimeout(histTimer); histTimer=setTimeout(commitHistory,450); syncHistoryUI(); }
+function flushCommit(){ if(histTimer){ clearTimeout(histTimer); commitHistory(); } }
+function applyHistory(json){
+  applyingHistory=true;
+  state=JSON.parse(json);
+  histBase=json;
+  save(); syncUI(); render();
+  applyingHistory=false;
+  syncHistoryUI();
+}
+function doUndo(){
+  flushCommit();
+  if(!undoStack.length){ toast('これ以上は戻せません'); return; }
+  redoStack.push(JSON.stringify(state));
+  applyHistory(undoStack.pop());
+  toast('元に戻しました');
+}
+function doRedo(){
+  flushCommit();
+  if(!redoStack.length){ toast('やり直せる操作はありません'); return; }
+  undoStack.push(JSON.stringify(state));
+  applyHistory(redoStack.pop());
+  toast('やり直しました');
+}
+// Opening a different document (sample, slot, imported file) is a new editing session,
+// not an edit — history must not rewind across that boundary. Those flows already
+// confirm before discarding work, so nothing is lost by starting the stack over.
+function resetHistory(){
+  clearTimeout(histTimer); histTimer=null;
+  undoStack.length=0; redoStack.length=0;
+  histBase=JSON.stringify(state); syncHistoryUI();
+}
+function syncHistoryUI(){
+  const u=$('#undoBtn'), r=$('#redoBtn');
+  if(u) u.disabled=!undoStack.length && !histTimer;
+  if(r) r.disabled=!redoStack.length;
+}
 const get = p=>p.split('.').reduce((o,k)=>(o==null?o:o[k]),state);
 function set(p,v){ const ks=p.split('.'), last=ks.pop(); ks.reduce((o,k)=>o[k],state)[last]=v; }
 
@@ -2163,6 +2232,16 @@ $('#fsr').oninput=e=>{ state.fs=+e.target.value; $('#fsv').textContent=Math.roun
   $$('.page').forEach(p=>p.style.setProperty('--fs',state.fs)); clearTimeout(window._ov2); window._ov2=setTimeout(checkOverflow,150); };
 $('#zoomBtn').onclick=()=>{ zoom = zoom==='fit'?'100':'fit';
   $('#zoomBtn').textContent = zoom==='fit'?'表示：幅に合わせる':'表示：原寸 100%'; fit(); };
+$('#undoBtn').onclick=doUndo;
+$('#redoBtn').onclick=doRedo;
+// The editor rebuilds the DOM on every render, so the browser's own contenteditable
+// undo would desync — handle the shortcut ourselves everywhere, including inside fields.
+addEventListener('keydown',e=>{
+  if(!(e.ctrlKey||e.metaKey) || e.altKey) return;
+  const k=e.key.toLowerCase();
+  if(k==='z'){ e.preventDefault(); e.shiftKey?doRedo():doUndo(); }
+  else if(k==='y'){ e.preventDefault(); doRedo(); }
+});
 $('#logoBtn').onclick=()=>$('#logoInput').click();
 $('#logoInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
@@ -2414,7 +2493,7 @@ $('#slotLoadBtn').onclick=()=>{
   const k=$('#slotSel').value; if(!k) return;
   if(!confirm('「'+k+'」を開きます。いま編集中の内容は置き換わります。よろしいですか？')) return;
   state=migrate(JSON.parse(JSON.stringify(getSlots()[k].state)));
-  save(); syncUI(); render();
+  save(); syncUI(); render(); resetHistory();
 };
 $('#slotDelBtn').onclick=()=>{
   const k=$('#slotSel').value; if(!k) return;
@@ -2434,7 +2513,7 @@ $('#impBtn').onclick=()=>$('#impInput').click();
 $('#impInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.categories) throw 0; state=migrate(o); save(); syncUI(); render(); }
+  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.categories) throw 0; state=migrate(o); save(); syncUI(); render(); resetHistory(); }
     catch(err){ alert('このファイルは読み込めませんでした。'); } };
   r.readAsText(f);
 };
@@ -2442,7 +2521,7 @@ $('#samplesel').onchange=e=>{
   const v=e.target.value; e.target.value='';
   if(!v) return;
   if(!confirm('いま編集中の内容は消えます。よろしいですか？')) return;
-  state=fresh(v); save(); syncUI(); render();
+  state=fresh(v); save(); syncUI(); render(); resetHistory();
 };
 function syncUI(){
   $$('#designs .dbtn').forEach((b,i)=>b.classList.toggle('on',DESIGNS[i].id===state.design));
@@ -2526,16 +2605,20 @@ $('#helpBtn').onclick=()=>{
     <p><b>店名・品目名・価格など、テンプレートに元から入っている文字</b>も、そのまま動かしたり大きさを変えたりできます。文字をクリックすると上に小さなツールバーが出ます。<br>
       <b>⠿</b> ドラッグでその場から自由に移動 ／ <b>A− A＋</b> その文字だけの大きさを調整 ／ <b>↺</b> 元の位置・大きさに戻す。<br>
       内容を書き換える・コピーするわけではなく、見た目の位置と大きさだけをその文字に対して調整する機能です。同じ店名が他のページや表紙にも表示されている場合も、そのページの表示だけが動き、他のページには影響しません。</p>
-    <h3>8. PDF にする・印刷する</h3>
+    <h3>9. 元に戻す・やり直す</h3>
+    <p>左パネル上部の <b>「↩ 元に戻す」</b>（<b>Ctrl+Z</b> ／ Mac は <b>⌘Z</b>）で、直前の操作を取り消せます。やり直しは <b>「やり直す ↪」</b>（<b>Ctrl+Shift+Z</b>）。<br>
+      文字の打ち替え・ドラッグでの移動・削除・デザイン変更まで、ひととおりの操作が対象です。うっかり動かしてしまったときや、消してしまったときにお使いください。<br>
+      連続して入力した文字はまとめて1回分として戻ります。なお<b>サンプルの読み込み・スロットを開く・ファイルを開く</b>と、そこから新しい編集の始まりとして履歴はリセットされます。</p>
+    <h3>10. PDF にする・印刷する</h3>
     <p>左下の <b>「PDF ／ 印刷する」</b> から。A4 ぴったりで出力されます。印刷所に入稿する場合も、この PDF をそのまま渡せます。</p>
-    <h3>9. 保存について</h3>
+    <h3>11. 保存について</h3>
     <p>入力した内容は<b>この端末のブラウザに自動保存</b>されます。さらに——</p>
     <p><b>スロットへ保存</b>：名前を付けてこのブラウザ内に何枚でも保存できます。グランド／ランチ／ドリンクの作り分けや、季節の切り替えに。<br>
     <b>ファイルに保存（.json）</b>：パソコン上のファイルとして書き出します。別のPCへ渡す・バックアップとして残す・印刷所への支給データと一緒に保管する、といった用途はこちら。<b>「ファイルを開く」</b>でいつでも復元できます。</p>
-    <h3>10. 書体と素材</h3>
+    <h3>12. 書体と素材</h3>
     <p><b>和文15種 × 欧文8種</b> を自由に組み合わせられます（手書き風・筆文字・レトロゲーム風なども）。<b>「背景・装飾」</b>では和紙・青海波・方眼などの背景パターンと飾り枠を重ねられ、濃さも調整できます。パターンの色は各デザインの文字色に自動でなじみます。<br>
       書体はインターネット経由で読み込むため、<b>オンラインで開く</b>のがおすすめです。オフラインでも編集・印刷はできますが、書体は端末標準のものに置き換わります。推奨ブラウザは <b>Chrome / Edge</b> です。</p>
-    <h3>11. 縦書き（KINARI）のコツ</h3>
+    <h3>13. 縦書き（KINARI）のコツ</h3>
     <p>価格は <b>カンマなしの数字</b>（例：1200）にすると、縦書きの中で数字が横に組まれ、きれいに収まります。</p>
     <div class="foot"><button class="btn primary" id="mClose">とじる</button></div>`);
 };
@@ -2552,7 +2635,7 @@ if(lpD) DESIGNS.forEach(d=>{
   b.innerHTML=`<span class="sw" style="background:${d.sw}"></span><span class="nm">${d.nm}<small>${d.jp}</small></span>`;
   b.onclick=()=>{
     if(localStorage.getItem(KEY) && !confirm('前回の編集内容ではなく、「'+d.nm+'」のサンプルを開きますか？（キャンセル＝編集中の内容のまま）')) return;
-    state=fresh(DSAMPLE[d.id]||'cafe'); state.design=d.id; save(); syncUI(); render(); showApp();
+    state=fresh(DSAMPLE[d.id]||'cafe'); state.design=d.id; save(); syncUI(); render(); resetHistory(); showApp();
   };
   lpD.appendChild(b);
 });
@@ -2560,7 +2643,7 @@ $$('.lpstart').forEach(b=>b.onclick=()=>{
   const k=b.dataset.sample;
   const msg=k==='blank' ? '編集中の内容を消して、白紙から始めますか？' : '前回の編集内容ではなく、サンプルから始めますか？（キャンセル＝前回の続き）';
   if(k && (!localStorage.getItem(KEY) || confirm(msg)))
-    { state=fresh(k); save(); syncUI(); render(); }
+    { state=fresh(k); save(); syncUI(); render(); resetHistory(); }
   showApp();
 });
 $('#toTop').onclick=showLP;
@@ -2592,6 +2675,10 @@ else if(localStorage.getItem(KEY)) showApp();
 
 /* ---------------- go ---------------- */
 syncUI(); render();
+// startup (deep link, restored session) reassigns state; start history from what the
+// user actually sees so the first Ctrl+Z can't rewind to a document they never had.
+clearTimeout(histTimer); histTimer=null;
+undoStack.length=0; redoStack.length=0; histBase=JSON.stringify(state); syncHistoryUI();
 setTimeout(fit,600);
 </script>
 </body>
