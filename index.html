@@ -284,6 +284,11 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   .blk-tools,.blk-rz,.blk-add{display:none !important}
   .blk::after{display:none !important}
 }
+/* Touch devices never fire :hover. The block toolbars still appear on tap (via .sel),
+   but the page-level add bar has no such fallback — it stayed invisible yet tappable.
+   touch-action keeps a drag on a handle from panning the page instead of moving. */
+@media (hover:none){ .blk-add{opacity:.9} }
+.blk-grip,.blk-rz,#fieldGrip{touch-action:none}
 
 /* ---------- narrow screens ---------- */
 @media screen and (max-width:900px){
@@ -986,7 +991,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
 @page{size:A4;margin:0}
 @media print{
   html,body{background:#fff !important}
-  .side,.mask,.warn,.pagegap{display:none !important}
+  .side,.mask,.warn,.pagegap,.ttool{display:none !important}
   .app{display:block}
   .stagewrap{padding:0 !important;overflow:visible !important}
   .stagebox{height:auto !important;width:auto !important;margin:0 !important}
