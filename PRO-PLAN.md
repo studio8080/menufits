@@ -1,7 +1,12 @@
 # PRO-PLAN.md — 料金プランの設計
 
 作成: 2026-09-01。MenuFits に有料プラン（Pro）を導入するための設計書。
-**まだ何も実装していない。実装前に本書の「未決事項」を確定させること。**
+
+**現在の状態（2026-09-01 時点）**：フェーズ0（販売の土台）・フェーズ1（決済基盤）・
+フェーズ2（ロック実装）まで完了し、サンドボックスで決済からライセンス解放までの
+**通し確認が取れている**（§7-4）。ただし `index.html` の販売開始スイッチ
+`PRO_LAUNCHED` は **false のまま**で、公開サイトの挙動はこれまでと変わっていない。
+残りの作業は §7-3 の「まだ残っている作業」を参照。
 
 姉妹プロダクト MiseFits（`C:\Users\chaha\repos\Misefits`）の `HANDOFF.md` / `AGENTS.md` に
 決済まわりの先行事例が詳細に記録されている。**流用できるものは流用し、失敗した判断は繰り返さない。**
@@ -455,44 +460,90 @@ Undo/Redo、文字装飾、品目・ヘッダー・ロゴの写真、アクセ�
 > 2商品を売る段階になると、MiseFits の購入で MenuFits のキーが発行されうる。
 > 両側とも Price ID が設定されていることを、販売開始前に必ず確認すること。
 
+### 7-4. 通し確認の結果（2026-09-01・サンドボックス）
+
+デプロイ済み（`menufitsStripeWebhook` / `menufitsIssueLicense` / `menufitsVerifyLicense`、
+Node.js 22・第2世代）。**403 は出なかった**ので、今回は組織ポリシーの罠は踏んでいない。
+
+テストカード `4242 4242 4242 4242` で実際に決済し、次のとおり**一気通貫で動作を確認**した。
+
+決済 → Webhook 発火 → Firestore にキー発行（`MNPRO-5KK8-GXSS-CGQD`）→
+`pro-unlock.html` でのキー表示 → 「この端末で解放して開く」→ ライセンス保存 → アプリへ復帰。
+
+エンドポイント単体の確認：
+`verifyLicense` は 有効キー→`{valid:true}` ／ 同一デバイスの再送で枠を消費しない ／
+**小文字入力を正規化する** ／ 1文字違いを正しく拒否 ／ device 無しは存在チェックのみ。
+`issueLicense` は未知セッションで 404、`stripeWebhook` は署名なしPOSTを 400 で拒否。
+CORS ヘッダーは `menufits.kokokikaku.com` 固定で返るため、他オリジンはブラウザ側で弾かれる。
+
+#### 踏んだ罠（次に同じことをする人へ）
+
+1. **署名シークレットを取り違えた。** サンドボックスには MiseFits 用のエンドポイントも
+   並んでいるため、**どちらの `whsec_` かを間違えやすい**。症状は
+   `webhook signature verification failed: No signatures found matching the expected signature`
+   の 400。コードは MiseFits と同一で向こうは動いているので、`rawBody` の問題ではないと切り分けられる。
+2. **シークレットを更新しただけでは反映されない。** Functions は**デプロイ時点の
+   シークレットのバージョンを固定**する（デプロイログに `version: "1"` と埋め込まれる）。
+   `functions:secrets:set` は新しいバージョンを作るだけなので、**再デプロイが必須**。
+   CLI が「古いバージョンを破棄して再デプロイするか」と聞いてくるので Yes と答えればよい。
+3. **Stripe の Webhook は全エンドポイントに配信される。** サンドボックスの MiseFits 側も
+   同じ `checkout.session.completed` を受け取り、本番用の署名シークレットを持っているため
+   400 を返し続ける。実害は無いがリトライのノイズになるので、**サンドボックスの
+   MiseFits エンドポイントは無効化してよい**。
+4. **決済のやり直しは不要。** 失敗した配信は Stripe の「再送する」で replay できる。
+
+#### 見つかった問題：ライセンス控えメールが送れていない
+
+Webhook のログに次が出ている。**キー発行自体は成功して 200 を返している**ので、
+「メールの例外は握りつぶして 200 を返す」という設計は意図どおり効いた。
+
+```
+menufits license mail failed Error: Invalid login: 535-5.7.8
+Username and Password not accepted. ... BadCredentials ... - gsmtp
+```
+
+**SMTP のシークレット（`SMTP_USER` / `MAIL_FROM` / `SMTP_PASS`）は MiseFits と共有している。**
+`SMTP_PASS` はバージョン1と2が両方 ENABLED で、今回の関数はデプロイ時点の最新（2）を
+掴んでいる。**MiseFits の関数がどちらのバージョンを固定しているかは未確認**なので、
+「MiseFits のメールも止まっている」と断定はできない（MiseFits 側のログにメール失敗の記録は無いが、
+2026-08-31 03:12 以降に購入が無かっただけの可能性がある）。
+
+> **確認をおすすめする理由**：MiseFits は本番で販売中で、購入者はキーの控えメールを
+> 受け取れないことになる。決済直後のページにキーは出るので致命的ではないが、
+> ページを閉じた人が詰む。Google のアプリパスワードは**アカウントのパスワード変更で失効する**。
+> 2026-08-30 にアカウント移行をしているので、それが原因の可能性が高い。
+>
+> 対処：`studio@kokokikaku.com` でアプリパスワードを作り直し、`SMTP_PASS` を設定し直して
+> **MiseFits・MenuFits の両方の webhook 関数を再デプロイする**（上の罠2のとおり、
+> 再デプロイしないと反映されない）。
+
+#### 片付けが必要なテストデータ
+
+- Firestore `menufitsLicenses/MNPRO-5KK8-GXSS-CGQD` と
+  `menufitsSessions/cs_test_a1e8o5pKOhBJ3F9RMLjDWpUjhccDdi7LuI6fQT5pheK1MScdmJW2tPrx2E`。
+  **本番モードへ切り替える前に削除すること**（コレクションはテストと本番で共通なので、
+  サンドボックスで作ったキーが本番でも有効なまま残る）
+- 検証で使ったブラウザの `menufitsWebLicense` は削除済み
+
 **まだ残っている作業**
 
-1. **シークレットを2つ登録する**（値を扱うので、こちらでは実行していない）。
-   署名シークレットは Stripe の Webhook 詳細ページ「署名シークレット」から取得する。
+1. ~~**シークレットを2つ登録する**~~（2026-09-01 完了）。
+2. ~~**関数3本をデプロイする**~~（2026-09-01 完了）。
+3. ~~**通し確認**~~（2026-09-01 完了。§7-4 を参照）。
 
-   ```bash
-   cd C:/Users/chaha/repos/Misefits
-   firebase functions:secrets:set STRIPE_SECRET_KEY_MENUFITS      # サンドボックスの sk_test_...
-   firebase functions:secrets:set STRIPE_WEBHOOK_SECRET_MENUFITS  # we_1UAnlz... の whsec_...
-   ```
+4. **ライセンス控えメールの復旧**（§7-4）。アプリパスワードを作り直して `SMTP_PASS` を
+   設定し直し、**MiseFits と MenuFits の両方の webhook 関数を再デプロイする**。
 
-2. **関数3本だけをデプロイする**（既存の MiseFits 3本には触れない）。
+5. **`index.html` の Pro 文言・JSON-LD の書き換えと `sitemap.xml` への追加**（§4-2 のとおり**フェーズ3で**）
 
-   ```bash
-   firebase deploy --only functions:menufitsStripeWebhook,functions:menufitsIssueLicense,functions:menufitsVerifyLicense
-   ```
+6. **`PRO_LAUNCHED` を true にする**（本番の Payment Link 設定と同時。実質的な「販売開始」ボタン）
 
-   ※ 新しい関数は Cloud Run サービスが新規に作られるため、`allUsers` への公開が
-   組織ポリシーでブロックされる可能性がある（§5-2 の(3)と同じ罠）。
-   403 が返るときはそれを疑う。Windows では `firebase` が
-   `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` で異常終了することがあるので、
-   **Cloud Run のサービス一覧で実際の状態を確認する**こと。
-
-3. **通し確認**：`PRO_PURCHASE_URL` にサンドボックスの Payment Link を入れて
-   テストカード `4242 4242 4242 4242` で決済 → Webhook 発火 → Firestore にキー発行 →
-   `pro-unlock.html` でキー表示 → アプリで解放、まで一気通貫で確認する。
-   **確認が済んだら `PRO_PURCHASE_URL` は空に戻す**（サンドボックスのリンクを公開しない）。
-
-4. **`index.html` の Pro 文言・JSON-LD の書き換えと `sitemap.xml` への追加**（§4-2 のとおり**フェーズ3で**）
-
-5. **`PRO_LAUNCHED` を true にする**（本番の Payment Link 設定と同時。実質的な「販売開始」ボタン）
-
-6. **ヘルプ（`#helpBtn`）の各項目に PRO 表記を足す。** いまは付けていない。
+7. **ヘルプ（`#helpBtn`）の各項目に PRO 表記を足す。** いまは付けていない。
    販売前に付けるとロックされていない機能に PRO と書くことになり混乱するため、
    **フェーズ3で `PRO_LAUNCHED` と同時に**入れる。対象は 5（品目ライブラリ・店舗プロフィール）、
    7（表紙・裏表紙）、8（自由配置ブロック・テンプレート文字の移動）、11（スロット保存）、12（書体・素材）
 
-7. **本番モードへの切り替え**：ライブアカウントで商品・Price ID・Payment Link・Webhook を作り直し、
+8. **本番モードへの切り替え**：ライブアカウントで商品・Price ID・Payment Link・Webhook を作り直し、
    `functions/.env` の `STRIPE_PRICE_ID_MENUFITS` とシークレット2つをライブ用に差し替えて再デプロイ。
    **テストと本番で署名シークレットは別物**なので取り違えないこと。
 
