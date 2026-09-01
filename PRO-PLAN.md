@@ -412,15 +412,89 @@ Undo/Redo、文字装飾、品目・ヘッダー・ロゴの写真、アクセ�
 - `PRO_LAUNCHED=false` に戻すと、バッジ0・Pro欄非表示・Proデザインも素通り＝**従来と同一の挙動**
 - コンソールエラーなし
 
+### 7-3. フェーズ1（決済基盤）の記録（2026-09-01）
+
+**Functions のコード（`Misefits/functions/menufits.js` に新規作成）**
+
+`index.js` の MiseFits 用3関数には**一切触れていない**。末尾に
+`Object.assign(exports, require("./menufits"));` を1行足しただけ。
+
+| 項目 | 値 |
+|---|---|
+| 関数 | `menufitsStripeWebhook` / `menufitsIssueLicense` / `menufitsVerifyLicense` |
+| Firestore | `menufitsLicenses` / `menufitsSessions` |
+| キー形式 | `MNPRO-XXXX-XXXX-XXXX` |
+| CORS | `https://menufits.kokokikaku.com` のみ |
+| デバイス上限 | 5台 |
+
+**Stripe（サンドボックス／テストモードで作成済み）**
+
+| 項目 | 値 |
+|---|---|
+| Stripeアカウント | `acct_1U9FTFKwklnRvDMq`（**ここ企画サンドボックス**） |
+| 商品 | MenuFits Pro `prod_VBA2wAN390xnot` ／ ¥1,480 JPY・1回限り |
+| Price ID | `price_1UAniYKwklnRvDMqKN1SK2ob`（`functions/.env` に設定済み） |
+| Payment Link | `https://buy.stripe.com/test_7sYaEY6NY86Y1cxcn70VO01`（`plink_1UAnkaKwklnRvDMq68PpQPYg`） |
+| リダイレクト先 | `https://menufits.kokokikaku.com/pro-unlock.html?session_id={CHECKOUT_SESSION_ID}`（DOMから実値を照合済み） |
+| Managed Payments | **オフ**（既定はオンで、取引あたり3.5%の追加手数料がかかる） |
+| 電話番号の収集 | オフ |
+| Webhook | `we_1UAnlzKwklnRvDMquCZwr28t` ／ 宛先 `.../menufitsStripeWebhook` ／ `checkout.session.completed` の1件のみ |
+
+> **サンドボックスはライブとは別アカウントだった。** `functions/.env` の MiseFits 用
+> `STRIPE_PRICE_ID` は `price_1U9KMg3C6tqke0fyB4wtmO3T`（ライブ側の別アカウント）で、
+> 今回作った ID は `…KwklnRvDMq`（サンドボックス）。**ライブ側の販売には一切影響しない。**
+
+**そのため `STRIPE_SECRET_KEY` を共有しない設計にした。**
+共有シークレットはライブ用の `sk_live_` なので、サンドボックスのセッションを読めない
+（Price ID の照合で `listLineItems` を呼ぶため必ず失敗する）。MenuFits には
+`STRIPE_SECRET_KEY_MENUFITS` を別に持たせ、検証中はサンドボックスの鍵、販売開始時に
+ライブの鍵を入れ直す。片方の鍵を差し替えても、もう片方の販売を巻き込まない。
+
+> **Price ID の照合は「念のため」ではなく必須。** Stripe の Webhook は、その
+> イベント種別を購読している**すべてのエンドポイントに配信される**。同じアカウントで
+> 2商品を売る段階になると、MiseFits の購入で MenuFits のキーが発行されうる。
+> 両側とも Price ID が設定されていることを、販売開始前に必ず確認すること。
+
 **まだ残っている作業**
 
-1. **`pro.html` / `index.html` の `PRO_PURCHASE_URL`** に Stripe の Payment Link を入れる（フェーズ1）
-2. **`index.html` の Pro 文言・JSON-LD の書き換えと `sitemap.xml` への追加**（§4-2 のとおり**フェーズ3で**）
-3. **`PRO_LAUNCHED` を true にする**（1と同時。これがフェーズ3の実質的な「販売開始」ボタン）
-4. **ヘルプ（`#helpBtn`）の各項目に PRO 表記を足す。** いまは付けていない。
-   販売前に付けるとロックされていない機能に PRO と書くことになり、かえって混乱するため、
+1. **シークレットを2つ登録する**（値を扱うので、こちらでは実行していない）。
+   署名シークレットは Stripe の Webhook 詳細ページ「署名シークレット」から取得する。
+
+   ```bash
+   cd C:/Users/chaha/repos/Misefits
+   firebase functions:secrets:set STRIPE_SECRET_KEY_MENUFITS      # サンドボックスの sk_test_...
+   firebase functions:secrets:set STRIPE_WEBHOOK_SECRET_MENUFITS  # we_1UAnlz... の whsec_...
+   ```
+
+2. **関数3本だけをデプロイする**（既存の MiseFits 3本には触れない）。
+
+   ```bash
+   firebase deploy --only functions:menufitsStripeWebhook,functions:menufitsIssueLicense,functions:menufitsVerifyLicense
+   ```
+
+   ※ 新しい関数は Cloud Run サービスが新規に作られるため、`allUsers` への公開が
+   組織ポリシーでブロックされる可能性がある（§5-2 の(3)と同じ罠）。
+   403 が返るときはそれを疑う。Windows では `firebase` が
+   `Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)` で異常終了することがあるので、
+   **Cloud Run のサービス一覧で実際の状態を確認する**こと。
+
+3. **通し確認**：`PRO_PURCHASE_URL` にサンドボックスの Payment Link を入れて
+   テストカード `4242 4242 4242 4242` で決済 → Webhook 発火 → Firestore にキー発行 →
+   `pro-unlock.html` でキー表示 → アプリで解放、まで一気通貫で確認する。
+   **確認が済んだら `PRO_PURCHASE_URL` は空に戻す**（サンドボックスのリンクを公開しない）。
+
+4. **`index.html` の Pro 文言・JSON-LD の書き換えと `sitemap.xml` への追加**（§4-2 のとおり**フェーズ3で**）
+
+5. **`PRO_LAUNCHED` を true にする**（本番の Payment Link 設定と同時。実質的な「販売開始」ボタン）
+
+6. **ヘルプ（`#helpBtn`）の各項目に PRO 表記を足す。** いまは付けていない。
+   販売前に付けるとロックされていない機能に PRO と書くことになり混乱するため、
    **フェーズ3で `PRO_LAUNCHED` と同時に**入れる。対象は 5（品目ライブラリ・店舗プロフィール）、
    7（表紙・裏表紙）、8（自由配置ブロック・テンプレート文字の移動）、11（スロット保存）、12（書体・素材）
+
+7. **本番モードへの切り替え**：ライブアカウントで商品・Price ID・Payment Link・Webhook を作り直し、
+   `functions/.env` の `STRIPE_PRICE_ID_MENUFITS` とシークレット2つをライブ用に差し替えて再デプロイ。
+   **テストと本番で署名シークレットは別物**なので取り違えないこと。
 
 **公開の判断**：上の `index.html` の3変更と `privacy.html` は、Pro に触れていないので
 先に本番へ出してよい。むしろ **GA4 を先に入れておくと、有料化の前に「そもそも人が来ているのか」
