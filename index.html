@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>MenuFits（メニューフィッツ）｜飲食店メニューを、ひらいて、打ちかえて、PDF。</title>
-<meta name="description" content="登録不要・無料。ブラウザだけで飲食店のメニューが作れるツール。デザイン11種×書体378通り、縦書き・写真メニュー・文字装飾・A4のPDF出力に対応。データは端末内にのみ保存されます。">
+<meta name="description" content="登録不要。無料で1枚のメニューが作れる、飲食店向けのメニュー作成ツール。ブラウザだけで縦書き・写真メニュー・文字装飾に対応し、A4のPDFとして出力できます。データは端末内にのみ保存されます。">
 <meta property="og:title" content="MenuFits（メニューフィッツ）">
 <meta property="og:description" content="飲食店メニューを、ひらいて、打ちかえて、PDF。登録不要のメニュー作成ツール。">
 <meta property="og:type" content="website">
@@ -1101,16 +1101,16 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
  {"@type":"WebApplication","@id":"https://menufits.kokokikaku.com/#app",
   "name":"MenuFits","alternateName":"メニューフィッツ",
   "url":"https://menufits.kokokikaku.com/",
-  "description":"登録不要・無料。ブラウザだけで飲食店のメニューが作れるWebツール。デザイン11種、縦書き・写真メニュー・文字装飾に対応し、A4のPDFとして出力できます。",
+  "description":"登録不要。無料で1枚のメニューが作れる飲食店向けのメニュー作成Webツール。縦書き・写真メニュー・文字装飾に対応し、A4のPDFとして出力できます。デザイン全11種や冊子作成をまとめた買い切りのMenuFits Pro（¥1,480）もあります。",
   "applicationCategory":"DesignApplication","operatingSystem":"Web browser",
   "inLanguage":"ja","isAccessibleForFree":true,
-  "offers":{"@type":"Offer","price":"0","priceCurrency":"JPY"},
+  "offers":[{"@type":"Offer","name":"無料","price":"0","priceCurrency":"JPY"},{"@type":"Offer","name":"MenuFits Pro（買い切り）","price":"1480","priceCurrency":"JPY"}],
   "image":"https://menufits.kokokikaku.com/ogp.png",
   "publisher":{"@id":"https://kokokikaku.com/#org"}},
  {"@type":"Organization","@id":"https://kokokikaku.com/#org",
   "name":"ここ企画","url":"https://kokokikaku.com/"},
  {"@type":"FAQPage","mainEntity":[
-  {"@type":"Question","name":"本当に無料ですか？","acceptedAnswer":{"@type":"Answer","text":"はい。登録・課金・透かしは一切ありません。作成データはお使いのブラウザ内にのみ保存され、サーバーには送信されません。"}},
+  {"@type":"Question","name":"無料で使えるのはどこまでですか？","acceptedAnswer":{"@type":"Answer","text":"1枚のメニューを作ってA4のPDFにするところまで、ずっと無料です。登録も透かしもなく、PDFの出力回数にも制限はありません。デザインの全種類、冊子（表紙・3ページ以上）、複数メニューの作り分けをまとめた買い切りのMenuFits Pro（¥1,480・税込）を別途ご用意しています。月額課金ではありません。作成データはお使いのブラウザ内にのみ保存され、サーバーには送信されません。"}},
   {"@type":"Question","name":"PDFにはどうやって出力しますか？","acceptedAnswer":{"@type":"Answer","text":"「PDF／印刷する」ボタンからブラウザの印刷画面を開き、送信先を「PDFに保存」にするだけです。A4ぴったりで出力され、コンビニ印刷や印刷所への入稿にも使えます。"}},
   {"@type":"Question","name":"作ったメニューは商用利用できますか？","acceptedAnswer":{"@type":"Answer","text":"はい。作成したメニューの店舗での利用・印刷・配布は自由です。ツール本体の再配布・転売はご遠慮ください。"}},
   {"@type":"Question","name":"データはどこに保存されますか？","acceptedAnswer":{"@type":"Answer","text":"お使いの端末のブラウザ（localStorage）にのみ自動保存されます。名前を付けたスロット保存や、.jsonファイルへの書き出し・読み込みにも対応しています。"}},
@@ -1161,8 +1161,8 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <section class="lpsec">
     <h2>よくある質問</h2>
     <dl class="lpfaq">
-      <dt>本当に無料ですか？</dt>
-      <dd>はい。登録・課金・透かしは一切ありません。作成データはあなたのブラウザ内にのみ保存され、サーバーには送信されません。</dd>
+      <dt>無料で使えるのはどこまでですか？</dt>
+      <dd><b>1枚のメニューを作ってA4のPDFにするところまで、ずっと無料です。</b>登録も透かしもなく、出力回数の制限もありません。デザインの全種類・冊子・作り分けをまとめた買い切りの<a href="pro.html">MenuFits Pro（¥1,480）</a>もご用意しています（月額課金ではありません）。作成データはあなたのブラウザ内にのみ保存され、サーバーには送信されません。</dd>
       <dt>PDFにはどうやって出力しますか？</dt>
       <dd>「PDF／印刷する」ボタンからブラウザの印刷画面を開き、送信先を「PDFに保存」にするだけ。A4ぴったりで出力され、コンビニ印刷や入稿にも使えます。</dd>
       <dt>作ったメニューは商用利用できますか？</dt>
@@ -1176,7 +1176,11 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <footer class="lpfoot">
     <div class="lprow">
       <a href="#" id="lpHelp">使い方</a><span>・</span>
+      <a href="pro.html">料金・Proガイド</a><span>・</span>
+      <a href="faq.html">よくある質問</a><span>・</span>
+      <a href="releases.html">更新履歴</a><span>・</span>
       <a href="privacy.html">プライバシー・免責</a><span>・</span>
+      <a href="tokushoho.html">特定商取引法に基づく表記</a><span>・</span>
       <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
     </div>
     <div class="lprow lpshare">
@@ -1494,7 +1498,7 @@ const VERIFY_URL=FUNCTIONS_BASE+'/menufitsVerifyLicense';
 const LICKEY='menufitsWebLicense', DEVKEY='menufitsDeviceId';
 // Stripe の Payment Link。**pro.html の同名定数と必ずそろえること。**
 // 空のあいだは決済ページへ飛ばさず「準備中」と案内する。
-const PRO_PURCHASE_URL='';
+const PRO_PURCHASE_URL='https://buy.stripe.com/bJecMY2tI5nC0f1dSz9R601';
 const PRO_PRICE='¥1,480';
 
 // 無料で使える範囲。増減させたら pro.html の比較表も直すこと。
@@ -1516,7 +1520,7 @@ const FREE_SLOTS=1;
 
    不具合が出たときは false に戻すだけで、その場で元の挙動に戻せる。
    -------------------------------------------------------------------- */
-const PRO_LAUNCHED=false;
+const PRO_LAUNCHED=true;
 
 let proUnlocked=false;
 try{ proUnlocked = !!localStorage.getItem(LICKEY); }catch(e){}
@@ -2339,6 +2343,10 @@ const PRO_GROUP={
 
 function proBase(feature){ return String(feature).split(':')[0]; }
 
+// ヘルプ等の静的な文章に差し込む PRO バッジ。販売前（PRO_LAUNCHED=false）と
+// 解放済みの人には出さない。**テンプレートリテラルの中で ${proTag()} として使う。**
+function proTag(){ return (PRO_LAUNCHED && !isPro()) ? '<span class="probadge">PRO</span>' : ''; }
+
 // opts.freeAction を渡すと「無料で始める」ボタンを足せる。LPのデザイン一覧のように
 // まだ何も試していない人に当たる場所では、購入以外の出口を必ず用意する。
 function requestProPurchase(feature,opts){
@@ -2990,15 +2998,15 @@ $('#helpBtn').onclick=()=>{
       写真を多く入れたときは、<b>「保存（.json）」</b>でのバックアップをおすすめします。</p>
     <h3>4. 文字を飾る</h3>
     <p>紙面の文字を<b>ドラッグで選択</b>すると、小さなツールバーが浮かびます。<b>B</b> 太字 ／ <b>U</b> 下線 ／ マーカー ／ <b>A</b> アクセント色 ／ ⌫ 解除。品名のひと文字だけ色を変える、説明の一語にマーカーを引く、といった使い方ができます。</p>
-    <h3>5. よく使う品目・店舗情報を登録する</h3>
+    <h3>5. よく使う品目・店舗情報を登録する${proTag()}</h3>
     <p>品目にマウスを乗せて <b>☆</b> を押すと、その品目（写真ごと）が<b>ライブラリ</b>に登録されます。カテゴリーの <b>📋</b> から一覧が開き、クリックで挿入。<br>
       左パネルの<b>「マイデータ」</b>では、店名・住所・ロゴをまとめて<b>店舗プロフィール</b>として登録・切替できます。系列店や屋号違いの使い分けに。</p>
     <h3>6. 用紙からはみ出したら</h3>
     <p>上に注意が出ます。<b>文字サイズ</b>を下げる、<b>2段組み</b>にする、<b>頁+</b> で次のページへ送る、のどれかで収まります。</p>
-    <h3>7. 表紙・裏表紙を追加する</h3>
+    <h3>7. 表紙・裏表紙を追加する${proTag()}</h3>
     <p>左パネルの<b>「表紙・裏表紙」</b>から、通常ページとは別レイアウトの表紙・裏表紙を追加できます。<b>表紙</b>にはロゴ・ヘッダー写真・店名が大きく配置され、<b>裏表紙</b>には結びの一言メッセージと住所・営業時間が入ります。店名やロゴ、住所は通常ページと自動で同じ内容になり、二重に入力する必要はありません。もう一度ボタンを押すと外れます。<br>
       <b>スタイル</b>は4種類——<b>中央</b>（正統派）／<b>フレーム</b>（額縁枠）／<b>写真ベタ</b>（写真を全面に敷いて白文字）／<b>エディトリアル</b>（左寄せの大見出し）から選べます。</p>
-    <h3>8. 自由な位置にテキスト・画像を置く</h3>
+    <h3>8. 自由な位置にテキスト・画像を置く${proTag()}</h3>
     <p>紙面にマウスを乗せると右上に <b>「＋ テキスト」「＋ 画像」</b> が出ます。押すとブロックが追加され、<b>好きな位置へ自由に動かせます</b>。表紙・裏表紙はもちろん、通常のメニューページでも使えます。</p>
     <p>ブロックにマウスを乗せると出るツールバーで操作します。<br>
       <b>⠿</b> ドラッグして移動 ／ <b>A− A＋</b> 文字の大きさ ／ <b>📷</b> 画像の差し替え ／ <b>⬆ ⬇</b> 前面・背面 ／ <b>✕</b> 削除<br>
@@ -3014,10 +3022,10 @@ $('#helpBtn').onclick=()=>{
     <p>左下の <b>「PDF ／ 印刷する」</b> から。A4 ぴったりで出力されます。印刷所に入稿する場合も、この PDF をそのまま渡せます。</p>
     <h3>11. 保存について</h3>
     <p>入力した内容は<b>この端末のブラウザに自動保存</b>されます。さらに——</p>
-    <p><b>スロットへ保存</b>：名前を付けてこのブラウザ内に何枚でも保存できます。グランド／ランチ／ドリンクの作り分けや、季節の切り替えに。<br>
+    <p><b>スロットへ保存</b>${proTag()}：名前を付けてこのブラウザ内に何枚でも保存できます（無料では1枠まで）。グランド／ランチ／ドリンクの作り分けや、季節の切り替えに。<br>
     <b>ファイルに保存（.json）</b>：パソコン上のファイルとして書き出します。別のPCへ渡す・バックアップとして残す・印刷所への支給データと一緒に保管する、といった用途はこちら。<b>「ファイルを開く」</b>でいつでも復元できます。</p>
     <h3>12. 書体と素材</h3>
-    <p><b>和文21種 × 欧文18種</b> を自由に組み合わせられます（手書き風・筆文字・レトロゲーム風なども）。<b>「背景・装飾」</b>では和紙・青海波・方眼などの背景パターンと飾り枠を重ねられ、濃さも調整できます。パターンの色は各デザインの文字色に自動でなじみます。<br>
+    <p><b>和文21種 × 欧文18種</b>${proTag()} を自由に組み合わせられます（無料では和文8種×欧文6種）（手書き風・筆文字・レトロゲーム風なども）。<b>「背景・装飾」</b>では和紙・青海波・方眼などの背景パターンと飾り枠を重ねられ、濃さも調整できます。パターンの色は各デザインの文字色に自動でなじみます。<br>
       書体はインターネット経由で読み込むため、<b>オンラインで開く</b>のがおすすめです。オフラインでも編集・印刷はできますが、書体は端末標準のものに置き換わります。推奨ブラウザは <b>Chrome / Edge</b> です。</p>
     <h3>13. 縦書き（KINARI）のコツ</h3>
     <p>価格は <b>カンマなしの数字</b>（例：1200）にすると、縦書きの中で数字が横に組まれ、きれいに収まります。</p>
