@@ -544,6 +544,42 @@ Google のアプリパスワードは**2段階認証が有効でないと作成�
 `functions/menufits.js` の `menufitsFrom()` で、MAIL_FROM からアドレスだけを取り出して
 `MenuFits <...>` に組み直すようにした（シークレットは増やしていない）。
 
+#### 本番切替で踏んだ罠（2026-09-01・重要）
+
+本番モードへの切り替えで、**同じ購入1件に対して3回つまずいた**。順に記録する。
+
+**1. シークレットを2つ取り違えた（`sk_live_` の枠に `whsec_` を入れた）**
+
+症状はログの `Invalid API Key provided: whsec_bH***`（`StripeAuthenticationError` / 401）。
+**このエラーが出るということは、署名検証は通過している**（`constructEvent` の後の
+`listLineItems` で落ちている）。つまり **401 が出たら webhook secret は正しい**と切り分けられる。
+逆に署名が違えば 400 で、API は一度も呼ばれない。
+
+**2. `functions:secrets:set` の再デプロイは、ソースと `.env` を再アップロードしない**
+
+いちばんはまった。CLI の出力を見比べれば区別できる。
+
+| | 出力 |
+|---|---|
+| 通常のデプロイ | `preparing codebase` / `Loaded environment variables from .env` / `packaged ... for uploading` が出る |
+| `functions:secrets:set` の再デプロイ | **`Updating function ...` だけ** |
+
+後者はシークレットのバージョンを差し替えるだけなので、`.env` を書き換えても反映されない。
+今回は本番の Price ID が反映されず、webhook が `ignored (unrelated price)` を返し続けた。
+**`.env` を変えたら必ず `firebase deploy --only functions:...` を明示的に流すこと。**
+
+**3. Webhook 設定画面の「再送する」は、200 で成功済みの配信には効かない**
+
+`ignored (unrelated price)` は 200 なので Stripe は「配信成功」と見なし、自動再試行もしない。
+Webhook の詳細画面にある「再送する」ボタンを押しても新しい試行が作られなかった。
+
+**イベント画面（ワークベンチ → イベント → 該当イベント）の「Webhook エンドポイントへの配信」
+に並ぶ行ごとの「再送」ボタンを使うと通る。** 宛先が2つ（MiseFits と MenuFits）並ぶので、
+URL が `menufitsStripeWebhook` の行を選ぶこと。
+
+> **決済のやり直しは不要だった。** 設定を直したあとイベント画面から再送するだけで、
+> キー発行・メール送信まで正常に完了した。**購入が失敗しても、原因を直して再送すれば復旧できる。**
+
 #### 片付けが必要なテストデータ
 
 検証で3回テスト決済をしたので、`menufitsLicenses` に3件、`menufitsSessions` に3件の
