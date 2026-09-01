@@ -1,0 +1,194 @@
+/* ============================================================
+   MenuFits — サブページ共通スタイル
+   index.html（アプリ本体）は単一ファイル構成を維持するため、
+   このファイルは静的サブページ（pro / faq / privacy / tokushoho /
+   releases / pro-unlock）だけが読み込む。
+   ============================================================ */
+
+:root{
+  --f-mincho:"Shippori Mincho","Zen Old Mincho","Yu Mincho",YuMincho,"Hiragino Mincho ProN",serif;
+  --f-gothic:"Zen Kaku Gothic New","Noto Sans JP","Yu Gothic","Hiragino Kaku Gothic ProN",sans-serif;
+  --f-en:"Jost","Helvetica Neue",Arial,sans-serif;
+
+  --paper:#fffdf8;
+  --ink:#2b2820;
+  --ink-soft:#4b4639;
+  --mut:#8b8578;
+  --line:rgba(28,25,18,.09);
+  --line-2:rgba(28,25,18,.16);
+  --dark:#26231c;
+  --cream:#f2ead8;
+  --gold:#c9a227;
+  --brown:#a3785a;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:linear-gradient(180deg,#eae8e2,#e5e2db);
+  color:var(--ink);
+  font-family:var(--f-gothic);
+  font-size:15px;
+  line-height:2;
+  letter-spacing:.04em;
+  -webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;
+}
+a{color:#7a5a2e;text-underline-offset:3px}
+a:hover{color:var(--dark)}
+img{max-width:100%;height:auto}
+
+/* ---------- header ---------- */
+.ph{
+  position:sticky;top:0;z-index:20;
+  display:flex;align-items:center;gap:14px;
+  padding:14px 24px;
+  background:rgba(252,250,245,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--line);
+}
+.ph .brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--dark)}
+.ph .logo{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:9px;flex:0 0 auto;
+  background:var(--dark);color:var(--cream);
+  font-family:Georgia,serif;font-size:19px;line-height:1;
+}
+.ph .nm{font-family:var(--f-en);font-size:20px;font-weight:600;letter-spacing:.06em;line-height:1.1}
+.ph .kana{display:block;font-family:var(--f-gothic);font-size:10.5px;font-weight:500;color:var(--mut);letter-spacing:.14em;margin-top:2px}
+.ph .sp{flex:1}
+
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  border:1.5px solid var(--dark);background:var(--paper);color:var(--dark);
+  border-radius:99px;padding:12px 26px;
+  font:600 14px/1 var(--f-gothic);letter-spacing:.08em;
+  text-decoration:none;cursor:pointer;white-space:nowrap;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease),background .35s var(--ease);
+}
+.btn:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(28,25,18,.1),0 12px 28px rgba(28,25,18,.14);color:var(--dark)}
+.btn.primary{background:var(--dark);color:#f7f4ec;border-color:var(--dark)}
+.btn.primary:hover{background:#312d24;color:#f7f4ec}
+.btn.mini{padding:9px 16px;font-size:12.5px;border-width:1px}
+.btn.big{padding:16px 40px;font-size:16px}
+
+/* ---------- layout ---------- */
+main{max-width:860px;margin:0 auto;padding:26px 24px 72px}
+.crumb{font-size:12px;color:var(--mut);letter-spacing:.06em;margin-bottom:18px}
+.crumb a{font-weight:600;text-decoration:none}
+
+.head{
+  background:var(--paper);border:1px solid var(--line);border-radius:16px;
+  padding:34px 30px;margin-bottom:26px;
+  box-shadow:0 1px 2px rgba(28,25,18,.04),0 16px 36px rgba(28,25,18,.06);
+}
+h1{
+  font-family:var(--f-mincho);font-weight:600;
+  font-size:clamp(23px,3.4vw,30px);line-height:1.55;letter-spacing:.08em;
+  margin:0 0 10px;
+}
+.head p{margin:0;font-size:14px;line-height:1.95;color:var(--ink-soft)}
+.meta{margin-top:14px;font-size:12px;color:var(--mut);letter-spacing:.06em}
+
+section.card{
+  background:var(--paper);border:1px solid var(--line);border-radius:16px;
+  padding:28px 30px;margin-bottom:20px;
+  box-shadow:0 1px 2px rgba(28,25,18,.04),0 10px 26px rgba(28,25,18,.05);
+}
+h2{
+  font-family:var(--f-mincho);font-weight:600;
+  font-size:clamp(17px,2.3vw,21px);line-height:1.6;letter-spacing:.14em;
+  margin:0 0 6px;
+}
+h2+.sub{margin:0 0 20px;font-size:12.5px;color:var(--mut);letter-spacing:.06em}
+h3{
+  font-family:var(--f-gothic);font-weight:700;
+  font-size:15px;letter-spacing:.08em;margin:26px 0 6px;
+}
+h3:first-child{margin-top:0}
+p{margin:0 0 14px;font-size:14px;line-height:1.95;color:var(--ink-soft)}
+p:last-child{margin-bottom:0}
+ul,ol{margin:0 0 14px;padding-left:1.4em}
+li{margin-bottom:6px;font-size:14px;line-height:1.9;color:var(--ink-soft)}
+strong,b{color:var(--ink);font-weight:700}
+hr{border:0;border-top:1px solid var(--line);margin:26px 0}
+
+/* ---------- tables ---------- */
+.tablewrap{
+  background:var(--paper);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+  box-shadow:0 1px 2px rgba(28,25,18,.04),0 10px 26px rgba(28,25,18,.05);
+}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{padding:15px 20px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line);line-height:1.9}
+tr:last-child th,tr:last-child td{border-bottom:0}
+th{background:rgba(28,25,18,.035);color:var(--ink);font-size:12.5px;font-weight:700;letter-spacing:.08em;white-space:nowrap;width:190px}
+td{color:var(--ink-soft)}
+td ul{margin:0 0 6px;padding-left:1.3em}
+td li{margin-bottom:3px;font-size:13.5px}
+
+/* ---------- notes / callouts ---------- */
+.note{
+  background:rgba(201,162,39,.07);border:1px solid rgba(201,162,39,.28);
+  border-left:3px solid var(--gold);border-radius:0 10px 10px 0;
+  padding:14px 18px;margin:18px 0;font-size:13px;line-height:1.9;color:var(--ink-soft);
+}
+.note b{color:var(--ink)}
+.note:last-child{margin-bottom:0}
+.note.plain{background:rgba(28,25,18,.03);border-color:var(--line);border-left-color:var(--brown)}
+
+/* ---------- pro badge / feature lists ---------- */
+.pro{
+  display:inline-block;vertical-align:middle;
+  background:var(--dark);color:var(--cream);
+  font:600 9.5px/1 var(--f-en);letter-spacing:.14em;
+  padding:4px 7px 3px;border-radius:4px;margin:0 4px;
+  transform:translateY(-1px);
+}
+.free{
+  display:inline-block;vertical-align:middle;
+  background:rgba(28,25,18,.06);color:var(--ink-soft);border:1px solid var(--line-2);
+  font:600 9.5px/1 var(--f-en);letter-spacing:.14em;
+  padding:3px 7px 2px;border-radius:4px;margin:0 4px;
+  transform:translateY(-1px);
+}
+
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:0 0 6px}
+.plan{
+  background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:26px 26px 28px;
+  box-shadow:0 1px 2px rgba(28,25,18,.04),0 10px 26px rgba(28,25,18,.05);
+}
+.plan.hi{border-color:var(--line-2);box-shadow:0 1px 2px rgba(28,25,18,.05),0 16px 40px rgba(28,25,18,.1)}
+.plan .ttl{font-family:var(--f-en);font-size:13px;font-weight:600;letter-spacing:.22em;color:var(--brown);margin-bottom:10px}
+.plan .price{font-family:var(--f-mincho);font-size:32px;font-weight:600;letter-spacing:.04em;line-height:1.3}
+.plan .price small{font-size:13px;font-family:var(--f-gothic);color:var(--mut);letter-spacing:.06em;margin-left:8px}
+.plan .lead{margin:8px 0 18px;font-size:13px;color:var(--ink-soft);line-height:1.9}
+.plan ul{list-style:none;padding:0;margin:0 0 20px}
+.plan li{
+  position:relative;padding-left:1.5em;margin-bottom:9px;font-size:13.5px;line-height:1.8;
+}
+.plan li::before{content:"—";position:absolute;left:0;color:var(--brown)}
+.plan .btn{width:100%}
+
+/* ---------- footer ---------- */
+.pf{border-top:1px solid var(--line);background:rgba(252,250,245,.6);padding:26px 24px 40px}
+.pf-in{max-width:860px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:12px;color:var(--mut);letter-spacing:.06em}
+.pf-in b{font-family:var(--f-en);font-size:15px;font-weight:600;letter-spacing:.06em;color:var(--dark)}
+.pf-in a{font-weight:600;text-decoration:none}
+.pf-in .sp{flex:1}
+
+/* ---------- responsive ---------- */
+@media (max-width:720px){
+  body{font-size:14.5px}
+  .ph{padding:11px 14px;gap:10px}
+  .ph .logo{width:30px;height:30px;border-radius:8px;font-size:17px}
+  .ph .nm{font-size:17px}
+  .ph .kana{display:none}
+  main{padding:18px 14px 52px}
+  .head{padding:24px 20px;border-radius:14px}
+  section.card{padding:22px 20px;border-radius:14px}
+  th{width:auto;display:block;border-bottom:0;padding:14px 18px 2px;background:none;white-space:normal}
+  td{display:block;padding:0 18px 14px}
+  .plans{grid-template-columns:1fr}
+  .pf{padding:22px 14px 34px}
+}

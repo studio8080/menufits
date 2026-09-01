@@ -20,6 +20,54 @@
 <link rel="apple-touch-icon" href="/icon-512.png">
 <link rel="manifest" href="/manifest.webmanifest">
 <meta name="theme-color" content="#26231c">
+<script>
+/* ============================================================
+   アクセス解析（GA4）ローダー
+   ------------------------------------------------------------
+   単一ファイル構成を保つため、サブページが読み込む analytics.js と
+   同じ内容をここにインラインで持っている。
+   **analytics.js を直したら、こちらも必ず揃えること。**
+
+   GA_ID が空のあいだは外部への通信は一切発生しない。
+   計測を始めるときは、MenuFits 用に新規作成した GA4 プロパティの
+   測定ID（G-XXXXXXXXXX）を入れる。MiseFits のプロパティを使い回さないこと。
+
+   プライバシー：privacy.html のオプトアウト（localStorage の
+   menufitsAnalyticsOptOut）と Do Not Track を尊重する。
+   ============================================================ */
+(function(){
+  var GA_ID = 'G-4L5JYWNVGJ'; // MenuFits の GA4 測定ID（2026-09-01 作成）
+
+  window.MENUFITS_GA_ID = GA_ID;
+  window.trackEvent = function(){}; // 解析が無効でも安全に呼べるダミー
+
+  if(!GA_ID) return;
+
+  try{
+    if(localStorage.getItem('menufitsAnalyticsOptOut')==='1'){
+      window['ga-disable-'+GA_ID]=true;
+      return;
+    }
+  }catch(e){}
+
+  if(navigator.doNotTrack==='1'||window.doNotTrack==='1') return;
+
+  window.dataLayer=window.dataLayer||[];
+  window.gtag=function(){window.dataLayer.push(arguments);};
+  window.gtag('js', new Date());
+  window.gtag('config', GA_ID, {anonymize_ip:true});
+
+  var s=document.createElement('script');
+  s.async=true;
+  s.src='https://www.googletagmanager.com/gtag/js?id='+encodeURIComponent(GA_ID);
+  document.head.appendChild(s);
+
+  // 計測を足すときは必ずこのラッパーを使う（無効時は何もしない）
+  window.trackEvent=function(name,params){
+    try{ window.gtag('event',name,params||{}); }catch(e){}
+  };
+})();
+</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326231c'/%3E%3Ctext x='32' y='44' font-size='36' font-family='Georgia,serif' fill='%23f2ead8' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1091,7 +1139,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <footer class="lpfoot">
     <div class="lprow">
       <a href="#" id="lpHelp">使い方</a><span>・</span>
-      <a href="#" id="lpPriv">プライバシー・免責</a><span>・</span>
+      <a href="privacy.html">プライバシー・免責</a><span>・</span>
       <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
     </div>
     <div class="lprow lpshare">
@@ -2616,7 +2664,7 @@ $('#helpBtn').onclick=()=>{
     <p><b>スロットへ保存</b>：名前を付けてこのブラウザ内に何枚でも保存できます。グランド／ランチ／ドリンクの作り分けや、季節の切り替えに。<br>
     <b>ファイルに保存（.json）</b>：パソコン上のファイルとして書き出します。別のPCへ渡す・バックアップとして残す・印刷所への支給データと一緒に保管する、といった用途はこちら。<b>「ファイルを開く」</b>でいつでも復元できます。</p>
     <h3>12. 書体と素材</h3>
-    <p><b>和文15種 × 欧文8種</b> を自由に組み合わせられます（手書き風・筆文字・レトロゲーム風なども）。<b>「背景・装飾」</b>では和紙・青海波・方眼などの背景パターンと飾り枠を重ねられ、濃さも調整できます。パターンの色は各デザインの文字色に自動でなじみます。<br>
+    <p><b>和文21種 × 欧文18種</b> を自由に組み合わせられます（手書き風・筆文字・レトロゲーム風なども）。<b>「背景・装飾」</b>では和紙・青海波・方眼などの背景パターンと飾り枠を重ねられ、濃さも調整できます。パターンの色は各デザインの文字色に自動でなじみます。<br>
       書体はインターネット経由で読み込むため、<b>オンラインで開く</b>のがおすすめです。オフラインでも編集・印刷はできますが、書体は端末標準のものに置き換わります。推奨ブラウザは <b>Chrome / Edge</b> です。</p>
     <h3>13. 縦書き（KINARI）のコツ</h3>
     <p>価格は <b>カンマなしの数字</b>（例：1200）にすると、縦書きの中で数字が横に組まれ、きれいに収まります。</p>
@@ -2648,19 +2696,9 @@ $$('.lpstart').forEach(b=>b.onclick=()=>{
 });
 $('#toTop').onclick=showLP;
 const lpHelp=$('#lpHelp'); if(lpHelp) lpHelp.onclick=e=>{ e.preventDefault(); $('#helpBtn').click(); };
-const lpPriv=$('#lpPriv'); if(lpPriv) lpPriv.onclick=e=>{ e.preventDefault();
-  openModal(`
-    <h2>プライバシー・免責</h2>
-    <h3>データの保存について</h3>
-    <p>入力した内容・写真・保存スロット等は、すべて<b>お使いのブラウザ内（localStorage）にのみ保存</b>されます。当方のサーバーに送信・保存されることはありません。ブラウザのデータ消去を行うと編集内容も消えます。大切なデータは「ファイルに保存（.json）」でのバックアップをおすすめします。</p>
-    <h3>通信について</h3>
-    <p>書体（Google Fonts）の読み込みのために Google のサーバーと通信します。それ以外の外部通信はありません。</p>
-    <h3>免責</h3>
-    <p>本ツールは現状有姿で提供されます。出力物の内容（価格・表記・アレルギー表示等）の正確性は利用者ご自身でご確認ください。本ツールの利用により生じたいかなる損害についても、運営者は責任を負いません。</p>
-    <h3>利用範囲</h3>
-    <p>作成したメニューの商用利用・印刷・配布は自由です。ツール本体の再配布・転売はご遠慮ください。</p>
-    <div class="foot"><button class="btn primary" id="mClose">とじる</button></div>`);
-};
+// プライバシー・免責は privacy.html（独立ページ）に一本化した。
+// 以前はここでモーダルを開いていたが、アクセス解析のオプトアウトUIと
+// 決済まわりの記載が必要になり、内容が二重管理になるため廃止した。
 $$('[data-share]').forEach(b=>b.onclick=()=>{
   const t=b.dataset.share;
   if(t==='x') window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(SHARE_TXT)+'&url='+encodeURIComponent(SHARE_URL),'_blank','noopener');

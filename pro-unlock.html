@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ご購入ありがとうございます | MenuFits Pro</title>
+<meta name="description" content="MenuFits Pro のご購入完了ページ。ライセンスキーの表示と、この端末での解放を行います。">
+<meta name="robots" content="noindex,nofollow">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://us-central1-misefits.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta name="theme-color" content="#26231c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326231c'/%3E%3Ctext x='32' y='44' font-size='36' font-family='Georgia,serif' fill='%23f2ead8' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/icon-512.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page.css">
+<script src="analytics.js"></script>
+<style>
+  .keybox{text-align:center;padding:10px 0 4px}
+  .keyval{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:clamp(18px,3.6vw,26px);font-weight:700;letter-spacing:.14em;
+    background:rgba(28,25,18,.04);border:1px dashed var(--line-2);border-radius:12px;
+    padding:20px 16px;margin:6px 0 18px;word-break:break-all;color:var(--ink);
+  }
+  .waiting{color:var(--mut);font-size:14px;letter-spacing:.06em}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line-2);border-top-color:var(--brown);
+    border-radius:50%;animation:sp .8s linear infinite;vertical-align:-2px;margin-right:8px}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+  .err{color:#8a3b17}
+</style>
+</head>
+<body>
+
+<header class="ph">
+  <a class="brand" href="./" aria-label="MenuFits トップへ">
+    <span class="logo">M</span>
+    <span>
+      <span class="nm">MenuFits</span>
+      <span class="kana">メニューフィッツ</span>
+    </span>
+  </a>
+  <span class="sp"></span>
+  <a class="btn mini" href="./">アプリを開く</a>
+</header>
+
+<main>
+  <div class="head" style="text-align:center">
+    <h1>ご購入ありがとうございます</h1>
+    <p>MenuFits Pro のライセンスキーをお届けします。<br>
+      同じキーを、ご入力いただいたメールアドレス宛にもお送りしています。</p>
+  </div>
+
+  <section class="card">
+    <div class="keybox">
+      <h2 style="margin-bottom:14px">ライセンスキー</h2>
+
+      <div id="pending">
+        <p class="waiting"><span class="spin"></span>キーを発行しています。数秒お待ちください…</p>
+      </div>
+
+      <div id="ready" hidden>
+        <div class="keyval" id="keyval">—</div>
+        <div class="acts">
+          <button class="btn primary" id="unlockBtn" type="button">この端末で解放して MenuFits を開く</button>
+          <button class="btn" id="copyBtn" type="button">キーをコピー</button>
+        </div>
+        <p id="unlockMsg" style="margin-top:16px;font-size:13px;color:var(--mut)"></p>
+      </div>
+
+      <div id="failed" hidden>
+        <p class="err"><b>キーを取得できませんでした。</b></p>
+        <p style="font-size:13.5px">
+          決済は完了している可能性があります。<b>このページを閉じずに</b>、
+          しばらく待ってから下のボタンで再試行してください。<br>
+          解決しない場合は、購入時のメールアドレスを添えて
+          <a href="https://kokokikaku.com/" target="_blank" rel="noopener">お問い合わせ</a>ください。
+          こちらで確認のうえ、キーをお送りします。
+        </p>
+        <div class="acts"><button class="btn" id="retryBtn" type="button">もう一度試す</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>このページのURLを控えておいてください</h2>
+    <p>このページをブックマークしておけば、あとから同じキーをいつでも再表示できます。
+      キーの控えはメールでもお送りしていますので、あわせて保管をおすすめします。</p>
+    <div class="note plain">
+      <b>解放のしかた（手で入力する場合）</b><br>
+      MenuFits を開く → 左パネルを下にスクロールして「MenuFits Pro」欄へ → 上のキーを貼り付けて「解放する」。<br>
+      同じキーで最大5台（ブラウザ単位）まで解放できます。
+    </div>
+  </section>
+</main>
+
+<footer class="pf">
+  <div class="pf-in">
+    <b>MenuFits</b>
+    <span class="sp"></span>
+    <a href="./">アプリ</a>
+    <a href="pro.html">料金・Proガイド</a>
+    <a href="faq.html">よくある質問</a>
+    <a href="privacy.html">プライバシー・免責</a>
+    <a href="tokushoho.html">特定商取引法に基づく表記</a>
+    <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
+  </div>
+</footer>
+
+<script>
+/* ------------------------------------------------------------------
+   Stripe の Payment Link のリダイレクト先。
+   pro-unlock.html?session_id={CHECKOUT_SESSION_ID} で呼ばれる。
+
+   FUNCTIONS_BASE は MiseFits と同じ Firebase プロジェクト（misefits）に
+   相乗りする前提。関数名だけ menufits* で分けている。
+   ※ index.html 側にも同じ定数がある。変更時は両方そろえること。
+   ------------------------------------------------------------------ */
+var FUNCTIONS_BASE = 'https://us-central1-misefits.cloudfunctions.net';
+var ISSUE_URL  = FUNCTIONS_BASE + '/menufitsIssueLicense';
+var VERIFY_URL = FUNCTIONS_BASE + '/menufitsVerifyLicense';
+
+var LICENSE_KEY_STORE = 'menufitsWebLicense';
+var DEVICE_KEY_STORE  = 'menufitsDeviceId';
+
+var $ = function (id) { return document.getElementById(id); };
+var sessionId = new URLSearchParams(location.search).get('session_id') || '';
+var licenseKey = '';
+
+function deviceId() {
+  try {
+    var d = localStorage.getItem(DEVICE_KEY_STORE);
+    if (!d) {
+      d = 'd' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem(DEVICE_KEY_STORE, d);
+    }
+    return d;
+  } catch (e) { return ''; }
+}
+
+function showReady(key) {
+  licenseKey = key;
+  $('keyval').textContent = key;
+  $('pending').hidden = true;
+  $('failed').hidden = true;
+  $('ready').hidden = false;
+
+  // 購入イベントはリロードでの二重計上を防ぐ
+  try {
+    var mark = 'menufitsPurchaseTracked:' + sessionId;
+    if (sessionId && localStorage.getItem(mark) !== '1') {
+      localStorage.setItem(mark, '1');
+      if (window.trackEvent) {
+        window.trackEvent('purchase', {
+          transaction_id: sessionId,
+          value: 1480,
+          currency: 'JPY',
+          items: [{ item_id: 'menufits_pro', item_name: 'MenuFits Pro', price: 1480, quantity: 1 }]
+        });
+      }
+    }
+  } catch (e) {}
+}
+
+function showFailed() {
+  $('pending').hidden = true;
+  $('ready').hidden = true;
+  $('failed').hidden = false;
+}
+
+/* Webhook が Firestore に書き終わるまで数秒かかることがあるので、
+   1.5秒間隔・最大約12秒ポーリングする。 */
+function poll(triesLeft) {
+  if (!sessionId) { showFailed(); return; }
+  fetch(ISSUE_URL + '?session_id=' + encodeURIComponent(sessionId))
+    .then(function (r) { return r.json().catch(function () { return {}; }); })
+    .then(function (j) {
+      if (j && j.found && j.key) { showReady(j.key); return; }
+      if (triesLeft > 0) setTimeout(function () { poll(triesLeft - 1); }, 1500);
+      else showFailed();
+    })
+    .catch(function () {
+      if (triesLeft > 0) setTimeout(function () { poll(triesLeft - 1); }, 1500);
+      else showFailed();
+    });
+}
+
+$('retryBtn').onclick = function () {
+  $('failed').hidden = true;
+  $('pending').hidden = false;
+  poll(8);
+};
+
+$('copyBtn').onclick = function () {
+  try {
+    navigator.clipboard.writeText(licenseKey);
+    $('unlockMsg').textContent = 'キーをコピーしました。';
+  } catch (e) {
+    $('unlockMsg').textContent = 'コピーできませんでした。キーを選択して手動でコピーしてください。';
+  }
+};
+
+$('unlockBtn').onclick = function () {
+  var btn = $('unlockBtn');
+  btn.disabled = true;
+  $('unlockMsg').textContent = '解放しています…';
+  fetch(VERIFY_URL + '?key=' + encodeURIComponent(licenseKey) + '&device=' + encodeURIComponent(deviceId()))
+    .then(function (r) { return r.json().catch(function () { return {}; }); })
+    .then(function (j) {
+      if (j && j.valid) {
+        try { localStorage.setItem(LICENSE_KEY_STORE, licenseKey); } catch (e) {}
+        if (window.trackEvent) window.trackEvent('license_unlock_success', { location: 'pro_unlock' });
+        location.href = './';
+        return;
+      }
+      var reason = (j && j.reason) || 'invalid';
+      if (window.trackEvent) window.trackEvent('license_unlock_fail', { location: 'pro_unlock', reason: reason });
+      $('unlockMsg').textContent = reason === 'device_limit'
+        ? '解放できる台数（5台）の上限に達しています。お問い合わせいただければリセットします。'
+        : 'このキーは確認できませんでした。時間をおいて、もう一度お試しください。';
+      btn.disabled = false;
+    })
+    .catch(function () {
+      if (window.trackEvent) window.trackEvent('license_unlock_fail', { location: 'pro_unlock', reason: 'network' });
+      $('unlockMsg').textContent = '通信に失敗しました。ネットワークをご確認のうえ、もう一度お試しください。';
+      btn.disabled = false;
+    });
+};
+
+poll(8);
+</script>
+</body>
+</html>
