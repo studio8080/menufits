@@ -492,9 +492,9 @@ CORS ヘッダーは `menufits.kokokikaku.com` 固定で返るため、他オリ
    MiseFits エンドポイントは無効化してよい**。
 4. **決済のやり直しは不要。** 失敗した配信は Stripe の「再送する」で replay できる。
 
-#### 見つかった問題：ライセンス控えメールが送れていない
+#### 見つかった問題：ライセンス控えメールが送れていなかった（原因究明・解消済み）
 
-Webhook のログに次が出ている。**キー発行自体は成功して 200 を返している**ので、
+Webhook のログに次が出た。**キー発行自体は成功して 200 を返している**ので、
 「メールの例外は握りつぶして 200 を返す」という設計は意図どおり効いた。
 
 ```
@@ -502,27 +502,55 @@ menufits license mail failed Error: Invalid login: 535-5.7.8
 Username and Password not accepted. ... BadCredentials ... - gsmtp
 ```
 
-**SMTP のシークレット（`SMTP_USER` / `MAIL_FROM` / `SMTP_PASS`）は MiseFits と共有している。**
-`SMTP_PASS` はバージョン1と2が両方 ENABLED で、今回の関数はデプロイ時点の最新（2）を
-掴んでいる。**MiseFits の関数がどちらのバージョンを固定しているかは未確認**なので、
-「MiseFits のメールも止まっている」と断定はできない（MiseFits 側のログにメール失敗の記録は無いが、
-2026-08-31 03:12 以降に購入が無かっただけの可能性がある）。
+**真の原因は「アカウント移行でアプリパスワードが失効した」ではなかった。**
+`studio@kokokikaku.com` は **2段階認証プロセスが有効になっていなかった**。
+Google のアプリパスワードは**2段階認証が有効でないと作成すらできない**ため、
+`myaccount.google.com/apppasswords` は「お使いのアカウントでは利用できません」と表示され、
+`SMTP_PASS` には（アプリパスワードではなく）通常のアカウントパスワードが入っていた。
 
-> **確認をおすすめする理由**：MiseFits は本番で販売中で、購入者はキーの控えメールを
-> 受け取れないことになる。決済直後のページにキーは出るので致命的ではないが、
-> ページを閉じた人が詰む。Google のアプリパスワードは**アカウントのパスワード変更で失効する**。
-> 2026-08-30 にアカウント移行をしているので、それが原因の可能性が高い。
->
-> 対処：`studio@kokokikaku.com` でアプリパスワードを作り直し、`SMTP_PASS` を設定し直して
-> **MiseFits・MenuFits の両方の webhook 関数を再デプロイする**（上の罠2のとおり、
-> 再デプロイしないと反映されない）。
+つまり **このメール機能は一度も動いたことがなかった。** SMTP のシークレットは MiseFits と
+共有なので、**MiseFits のライセンス控えメールも同じく送れていなかった**ことになる。
+MiseFits は 2026-08-31 に販売を開始しているので、**それ以降に購入があった場合、
+その購入者には控えメールが届いていない**（決済直後のページにキーは表示されるので完全に詰みはしないが、
+Stripe の決済履歴を確認しておくこと）。
+
+エラーメッセージは対処の段階で次のように変化した。切り分けの手がかりになる。
+
+| メッセージ | 意味 |
+|---|---|
+| `535-5.7.8 Username and Password not accepted` | 認証情報がそもそも通らない |
+| `534-5.7.9 Application-specific password required` | **通常のパスワードを入れている**。アプリパスワードが要る |
+| （エラーなし） | 送信成功。このコードは失敗時のみログを出す |
+
+**解消手順（2026-09-01 実施）**
+
+1. `studio@kokokikaku.com` で**2段階認証プロセスを有効化**（これをしないとアプリパスワードを作れない）
+2. `myaccount.google.com/apppasswords` でアプリパスワードを作成
+3. `firebase functions:secrets:set SMTP_PASS` → 再デプロイの確認に Yes
+   （`stripeWebhook` と `menufitsStripeWebhook` の両方が対象に挙がる）
+4. テスト決済をやり直して、ログにメール失敗が出ないことを確認
+
+> **重複ガードがあるので、同じセッションの再送では検証できない。**
+> `menufitsSessions/{id}` が既にあると「already processed」で早期 return し、
+> メール送信まで到達しない。**メールの検証には新しいテスト決済が要る。**
+
+#### 差出人名の修正（2026-09-01）
+
+`MAIL_FROM` は MiseFits と共有で `MiseFits <studio@kokokikaku.com>` が入っているため、
+そのままだと **MenuFits の購入者に「MiseFits」名義で届いてしまう**。
+`functions/menufits.js` の `menufitsFrom()` で、MAIL_FROM からアドレスだけを取り出して
+`MenuFits <...>` に組み直すようにした（シークレットは増やしていない）。
 
 #### 片付けが必要なテストデータ
 
-- Firestore `menufitsLicenses/MNPRO-5KK8-GXSS-CGQD` と
-  `menufitsSessions/cs_test_a1e8o5pKOhBJ3F9RMLjDWpUjhccDdi7LuI6fQT5pheK1MScdmJW2tPrx2E`。
-  **本番モードへ切り替える前に削除すること**（コレクションはテストと本番で共通なので、
-  サンドボックスで作ったキーが本番でも有効なまま残る）
+検証で3回テスト決済をしたので、`menufitsLicenses` に3件、`menufitsSessions` に3件の
+テストデータが残っている。**本番モードへ切り替える前に削除すること。**
+コレクションはテストと本番で共通なので、サンドボックスで作ったキーが本番でも有効なまま残る。
+
+| コレクション | 削除するドキュメント |
+|---|---|
+| `menufitsLicenses` | `MNPRO-5KK8-GXSS-CGQD` ／ `MNPRO-RMTG-2J7N-3762` ／ `MNPRO-MKB8-3ZBD-KFR9` |
+| `menufitsSessions` | `cs_test_a1e8o5pKOhBJ3F9RMLjDWpUjhccDdi7LuI6fQT5pheK1MScdmJW2tPrx2E` ／ `cs_test_a1cYMmFV2PRcixuBYKOGjtLBMKv3LQYDBOIwlrQROjhifP6f2tKLrjyjk5` ／ `cs_test_a1eOAHnGrlwNSxjMo4ZLjZVMipBjDVRs9qqFzX9diRG6Gtuh9oRN7rLkMi` |
 - 検証で使ったブラウザの `menufitsWebLicense` は削除済み
 
 **まだ残っている作業**
@@ -531,8 +559,9 @@ Username and Password not accepted. ... BadCredentials ... - gsmtp
 2. ~~**関数3本をデプロイする**~~（2026-09-01 完了）。
 3. ~~**通し確認**~~（2026-09-01 完了。§7-4 を参照）。
 
-4. **ライセンス控えメールの復旧**（§7-4）。アプリパスワードを作り直して `SMTP_PASS` を
-   設定し直し、**MiseFits と MenuFits の両方の webhook 関数を再デプロイする**。
+4. ~~**ライセンス控えメールの復旧**~~（2026-09-01 完了。§7-4）。
+   **ただし MiseFits 側は要確認**：8月31日の販売開始以降に購入があれば、その購入者には
+   控えメールが届いていない。Stripe の決済履歴を見て、該当者がいればキーを個別に送ること。
 
 5. **`index.html` の Pro 文言・JSON-LD の書き換えと `sitemap.xml` への追加**（§4-2 のとおり**フェーズ3で**）
 
