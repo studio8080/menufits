@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>使い方ガイド | MenuFits — 飲食店のメニューをブラウザで作ってA4のPDFにする</title>
+<meta name="description" content="MenuFits の使い方。紙面の文字をクリックして打ちかえ、写真を入れ、A4ぴったりのPDFにするまでの手順を、つまずきやすいところまで含めて説明します。縦書きの品書き、用紙からはみ出したときの対処、印刷所への入稿まで。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://menufits.kokokikaku.com/guide.html">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="MenuFits">
+<meta property="og:title" content="使い方ガイド | MenuFits">
+<meta property="og:description" content="紙面の文字をクリックして打ちかえ、A4のPDFにするまで。つまずきやすいところまで含めて説明します。">
+<meta property="og:url" content="https://menufits.kokokikaku.com/guide.html">
+<meta property="og:image" content="https://menufits.kokokikaku.com/ogp.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://menufits.kokokikaku.com/ogp.png">
+<meta name="theme-color" content="#26231c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326231c'/%3E%3Ctext x='32' y='44' font-size='36' font-family='Georgia,serif' fill='%23f2ead8' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="/icon-512.png">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="page.css">
+<script src="analytics.js"></script>
+<style>
+  .toc{display:flex;flex-wrap:wrap;gap:8px 10px;margin-top:14px}
+  .toc a{display:inline-block;border:1px solid var(--line-2);border-radius:99px;padding:7px 15px;
+    font-size:12.5px;font-weight:600;text-decoration:none;color:var(--ink-soft);letter-spacing:.06em}
+  .toc a:hover{background:var(--dark);color:var(--cream);border-color:var(--dark)}
+  .step{border-top:1px solid var(--line);padding:26px 0}
+  .step:first-of-type{border-top:0;padding-top:0}
+  .step:last-of-type{padding-bottom:0}
+  .step .n{font-family:var(--f-en);font-size:12px;font-weight:600;letter-spacing:.2em;color:var(--brown);margin-bottom:4px}
+  .step h3{margin:0 0 10px;font-size:16.5px}
+  .keys{display:inline-block;border:1px solid var(--line-2);border-radius:5px;padding:1px 7px;
+    font:600 12px/1.7 "SFMono-Regular",Consolas,Menlo,monospace;background:rgba(28,25,18,.04)}
+  .tip{background:rgba(201,162,39,.07);border:1px solid rgba(201,162,39,.28);border-left:3px solid var(--gold);
+    border-radius:0 10px 10px 0;padding:14px 18px;margin:16px 0;font-size:13px;line-height:1.95;color:var(--ink-soft)}
+  .tip b{color:var(--ink)}
+</style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+ {"@type":"HowTo","name":"MenuFits で飲食店のメニューを作ってA4のPDFにする",
+  "description":"ブラウザだけで飲食店のメニューを作り、A4ぴったりのPDFとして出力する手順。",
+  "totalTime":"PT15M",
+  "supply":[{"@type":"HowToSupply","name":"品目名と価格"},{"@type":"HowToSupply","name":"料理写真（任意）"}],
+  "tool":[{"@type":"HowToTool","name":"Google Chrome または Microsoft Edge"}],
+  "step":[
+   {"@type":"HowToStep","name":"デザインとサンプルを選ぶ","text":"カフェ・和食・ビストロ・中華のサンプルか、白紙から始めます。あとからデザインだけを切り替えても、入力した内容はそのまま残ります。","url":"https://menufits.kokokikaku.com/guide.html#start"},
+   {"@type":"HowToStep","name":"紙面の文字を打ちかえる","text":"紙の上の文字をクリックして、そのまま打ち替えます。品名やカテゴリーにマウスを乗せると、並べ替え・複製・追加・削除のボタンが出ます。","url":"https://menufits.kokokikaku.com/guide.html#edit"},
+   {"@type":"HowToStep","name":"写真を入れる","text":"品目にマウスを乗せて📷を押すと料理写真が入ります。自動で圧縮されます。","url":"https://menufits.kokokikaku.com/guide.html#photo"},
+   {"@type":"HowToStep","name":"用紙に収める","text":"はみ出したときは、文字サイズを下げる・2段組みにする・次のページへ送る、のいずれかで収まります。","url":"https://menufits.kokokikaku.com/guide.html#overflow"},
+   {"@type":"HowToStep","name":"A4のPDFにする","text":"「PDF／印刷する」から印刷画面を開き、送信先をPDFに保存にします。詳細設定で「背景のグラフィック」にチェックを入れてください。","url":"https://menufits.kokokikaku.com/guide.html#pdf"}
+  ]},
+ {"@type":"FAQPage","mainEntity":[
+  {"@type":"Question","name":"PDFにしたら背景色や柄が消えて白紙になりました","acceptedAnswer":{"@type":"Answer","text":"印刷画面の詳細設定を開き、「背景のグラフィック」にチェックを入れてください。Safariの場合は「背景を印刷」です。あわせて用紙サイズA4・余白なし・倍率100%をご確認ください。"}},
+  {"@type":"Question","name":"縦書きの品書きで数字がきれいに並びません","acceptedAnswer":{"@type":"Answer","text":"価格をカンマなしの数字（例：1200）にしてください。縦書きの中で数字が横に組まれ（縦中横）、きれいに収まります。"}},
+  {"@type":"Question","name":"写真が紙面に出てきません","acceptedAnswer":{"@type":"Answer","text":"KINARI（和・縦書き）とLUMIERE（コース）は、紙面の品位を保つため品目写真を表示しない設計です。写真を活かすならALBUM（写真メニュー）が向いています。"}},
+  {"@type":"Question","name":"作った内容が消えてしまいました","acceptedAnswer":{"@type":"Answer","text":"データはお使いのブラウザ内にのみ保存されるため、ブラウザのデータ消去・プライベートモード・別のブラウザからのアクセスで見えなくなります。大切なメニューは「ファイルに保存（.json）」で手元にバックアップしてください。"}}
+ ]},
+ {"@type":"BreadcrumbList","itemListElement":[
+  {"@type":"ListItem","position":1,"name":"MenuFits","item":"https://menufits.kokokikaku.com/"},
+  {"@type":"ListItem","position":2,"name":"使い方ガイド","item":"https://menufits.kokokikaku.com/guide.html"}
+ ]}
+]}
+</script>
+</head>
+<body>
+
+<header class="ph">
+  <a class="brand" href="./" aria-label="MenuFits トップへ">
+    <span class="logo">M</span>
+    <span>
+      <span class="nm">MenuFits</span>
+      <span class="kana">メニューフィッツ</span>
+    </span>
+  </a>
+  <span class="sp"></span>
+  <a class="btn mini" href="./">アプリを開く</a>
+</header>
+
+<main>
+  <nav class="crumb" aria-label="パンくず"><a href="./">MenuFits</a> ／ 使い方ガイド</nav>
+
+  <div class="head">
+    <h1>使い方ガイド</h1>
+    <p>MenuFits は、紙面の文字を<b>クリックして、そのまま打ちかえる</b>ツールです。操作はほぼこれだけで、
+      マニュアルを読まなくても使えるように作ってあります。<br>
+      このページは、その先の「つまずきやすいところ」まで含めた案内です。
+      困ったときだけ必要な項目を読んでください。</p>
+    <div class="toc">
+      <a href="#start">1 えらぶ</a>
+      <a href="#edit">2 打ちかえる</a>
+      <a href="#photo">3 写真</a>
+      <a href="#deco">4 文字を飾る</a>
+      <a href="#overflow">5 はみ出したら</a>
+      <a href="#pdf">6 PDFにする</a>
+      <a href="#save">7 保存</a>
+      <a href="#tategaki">8 縦書きのコツ</a>
+      <a href="#pro">9 Proでできること</a>
+      <a href="#trouble">困ったとき</a>
+    </div>
+  </div>
+
+  <section class="card" id="start">
+    <div class="step">
+      <div class="n">STEP 1</div>
+      <h3>えらぶ — サンプルから始めるのが早い</h3>
+      <p>白紙よりも、近い業態のサンプルを開いて中身を差し替えるほうが早く終わります。
+        カフェ／和食（縦書き）／ビストロ／中華の4つを用意しています。</p>
+      <p><b>デザインだけをあとから切り替えても、入力した内容はそのまま残ります。</b>
+        「とりあえず打ち込んでから、見た目を決める」という進め方ができます。
+        迷ったら全部のデザインを順に押してみてください。同じ内容が別の顔で出てきます。</p>
+      <div class="tip"><b>URLで直接開けます。</b>
+        <code>#cafe</code> ／ <code>#washoku</code> ／ <code>#bistro</code> ／ <code>#chuka</code> ／ <code>#blank</code> を
+        末尾に付けると、そのサンプルが開きます。ブックマークしておくと次回が早いです。</div>
+    </div>
+
+    <div class="step" id="edit">
+      <div class="n">STEP 2</div>
+      <h3>打ちかえる — 紙の上を直接さわる</h3>
+      <p>紙の上の文字を<b>クリックして、そのまま打ち替える</b>だけです。
+        空欄のところは、うすい文字で内容の目安が出ます。</p>
+      <p>品名やカテゴリーに<b>マウスを乗せる</b>と、小さなボタンが出ます。</p>
+      <ul>
+        <li><b>↑ ↓</b> 並べ替え</li>
+        <li><b>⧉</b> 複製（似た品目を足すときに速い）</li>
+        <li><b>★</b> 「おすすめ」タグを付ける／外す</li>
+        <li><b>＋</b> すぐ下に品目を追加</li>
+        <li><b>✕</b> 削除</li>
+        <li><b>頁+</b>（カテゴリー側）そのカテゴリーごと次のページへ送る</li>
+      </ul>
+      <p>操作を間違えたら <span class="keys">Ctrl+Z</span>（Mac は <span class="keys">⌘Z</span>）で元に戻せます。
+        やり直しは <span class="keys">Ctrl+Shift+Z</span>。文字の打ち替え・移動・削除・デザイン変更まで戻せます。</p>
+      <div class="tip"><b>先に品目を全部打ち込んでしまうこと。</b>
+        見た目を整えてから品目を足すと、また収まらなくなって調整のやり直しになります。
+        内容 → レイアウト → 装飾、の順が結局いちばん速いです。</div>
+    </div>
+
+    <div class="step" id="photo">
+      <div class="n">STEP 3</div>
+      <h3>写真を入れる</h3>
+      <p>品目にマウスを乗せて <b>📷</b> を押すと、料理写真が入ります。
+        <b>自動で軽く圧縮される</b>ので、スマホで撮ったままの写真をそのまま入れて構いません。
+        ページ上部の大きな写真は、左パネルの「ヘッダー写真」から入れます。</p>
+      <p><b>写真をいちばん活かせるのは ALBUM（写真メニュー）</b>です。
+        一方で <b>KINARI（和・縦書き）と LUMIERE（コース）は、紙面の品位を保つため品目写真を表示しません。</b>
+        「写真を入れたのに出てこない」ときは、たいていこれが理由です。</p>
+      <div class="tip"><b>写真を多く入れたら、必ず .json で保存を。</b>
+        写真はブラウザの保存領域を大きく使います。容量を超えると保存に失敗することがあるので、
+        写真の多いメニューは「ファイルに保存（.json）」で手元にも残してください。</div>
+    </div>
+
+    <div class="step" id="deco">
+      <div class="n">STEP 4</div>
+      <h3>文字を飾る</h3>
+      <p>紙面の文字を<b>ドラッグで選択</b>すると、小さなツールバーが浮かびます。</p>
+      <p><b>B</b> 太字 ／ <b>U</b> 下線 ／ マーカー ／ <b>A</b> アクセント色 ／ <b>⌫</b> 解除。
+        品名のひと文字だけ色を変える、説明の一語にマーカーを引く、といった細かい調整ができます。</p>
+      <p>やりすぎると読みにくくなるので、<b>1枚につき2〜3か所まで</b>にとどめるときれいに見えます。</p>
+    </div>
+
+    <div class="step" id="overflow">
+      <div class="n">STEP 5</div>
+      <h3>用紙からはみ出したら</h3>
+      <p>紙面の上に注意が出ます。収める方法は3つあります。</p>
+      <ol>
+        <li><b>文字サイズを下げる</b>（左パネルのスライダー）— いちばん手軽</li>
+        <li><b>2段組みにする</b> — 品目が多いときはこれが効きます</li>
+        <li><b>頁+ で次のページへ送る</b> — カテゴリーごと移動します</li>
+      </ol>
+      <p>なお、少しだけはみ出しているときは<b>自動で文字を縮めて1枚に収めます</b>。
+        そのときも注意が出るので、意図した仕上がりか確認してください。</p>
+    </div>
+
+    <div class="step" id="pdf">
+      <div class="n">STEP 6</div>
+      <h3>A4のPDFにする</h3>
+      <p>左下の <b>「PDF ／ 印刷する」</b> から印刷画面を開きます。ここで<b>2か所だけ</b>確認してください。</p>
+      <ol>
+        <li><b>送信先（プリンター）</b> → <b>PDF に保存</b></li>
+        <li><b>詳細設定</b> を開いて <b>「背景のグラフィック」にチェック</b></li>
+      </ol>
+      <p>用紙サイズ <b>A4</b> ／ 余白 <b>なし</b> ／ 倍率 <b>100%</b> であることも確認しておくと確実です。</p>
+      <div class="tip"><b>「PDFにしたら白紙になった」の原因はほぼこれです。</b>
+        背景色や背景柄は「背景のグラフィック」がオフだと印刷されません。
+        濃い色のデザイン（NOIR・BOLD・SHU など）ほど影響が大きく出ます。
+        Safari では「背景を印刷」という名前です。</div>
+      <p>出力されるPDFは<b>A4ぴったり</b>です。コンビニ印刷にも、印刷所への入稿にもそのまま使えます。</p>
+    </div>
+
+    <div class="step" id="save">
+      <div class="n">STEP 7</div>
+      <h3>保存について</h3>
+      <p>入力した内容は<b>この端末のブラウザに自動保存</b>されます。次に開いたときは、続きから始まります。</p>
+      <p><b>ファイルに保存（.json）</b>：パソコン上のファイルとして書き出します。
+        別のPCへ渡す・バックアップとして残す・印刷所への支給データと一緒に保管する、といった用途はこちらです。
+        「ファイルを開く」でいつでも復元できます。</p>
+      <p><b>スロットへ保存</b>：名前を付けてブラウザ内に保存します。
+        グランド／ランチ／ドリンクの作り分けや、季節の切り替えに使えます（無料では1枠まで）。</p>
+      <div class="tip"><b>データはあなたの端末の中だけにあります。</b>
+        サーバーには送信していません。裏を返すと、<b>ブラウザのデータを消すと編集内容も消えます</b>。
+        別の端末から続きを編集することもできません。大切なメニューは必ず <code>.json</code> で
+        手元に残してください。</div>
+    </div>
+
+    <div class="step" id="tategaki">
+      <div class="n">STEP 8</div>
+      <h3>縦書き（KINARI）のコツ</h3>
+      <p>KINARI は、行が右から左へ流れる<b>本物の縦組み</b>です。和食店・割烹・居酒屋のお品書きに向いています。</p>
+      <p>いちばん大事なコツは<b>価格をカンマなしの数字で書く</b>ことです（例：<code>1200</code>）。
+        こうすると縦書きの中で数字が横に組まれ（縦中横）、きれいに収まります。
+        <code>1,200</code> と書くと、カンマのところで数字が分かれて読みにくくなります。</p>
+      <p>品名は短いほうが縦組みは映えます。説明文を入れる場合も、1行に収まる長さを意識すると整います。</p>
+    </div>
+  </section>
+
+  <section class="card" id="pro">
+    <h2>Pro でできること</h2>
+    <p class="sub">無料のままでもメニューは完成します。ここから先は「作り込み」と「作り分け」の話です。</p>
+    <p><b>1枚のメニューを作ってA4のPDFにするところまでは、ずっと無料です。</b>
+      登録も透かしもなく、出力回数の制限もありません。
+      そのうえで、次のことがしたくなったときに買い切りの
+      <a href="pro.html">MenuFits Pro（¥1,480・税込）</a>があります。月額課金ではありません。</p>
+    <ul>
+      <li><b>デザインを全11種から選ぶ</b> — 定食・居酒屋・ラーメン・フレンチ・喫茶・エスニックが加わります</li>
+      <li><b>書体378通り・背景パターン23種・飾り枠9種</b> — 紙・文字・柄・枠の色も個別に調整でき、看板やロゴの色に紙面を寄せられます</li>
+      <li><b>冊子にする</b> — 表紙・裏表紙（4スタイル）を付けて、3ページ以上に。店名やロゴ・住所は通常ページと自動で揃うので二重入力は要りません</li>
+      <li><b>紙面を自由に作り込む</b> — 好きな位置にテキストや画像のブロックを置く。店名や価格をその場でドラッグして動かす、その文字だけ大きさを変える</li>
+      <li><b>作り分けと再利用</b> — スロット保存が無制限に。よく使う品目のライブラリ（☆で登録し📋から挿入）、系列店の店舗プロフィール</li>
+    </ul>
+    <p><a href="pro.html">→ 料金とProの詳細を見る</a></p>
+  </section>
+
+  <section class="card" id="trouble">
+    <h2>困ったとき</h2>
+
+    <h3>PDFにしたら背景色や柄が消えて白紙になった</h3>
+    <p>印刷画面の<b>詳細設定 →「背景のグラフィック」にチェック</b>を入れてください（Safari は「背景を印刷」）。
+      これが原因のほぼすべてです。</p>
+
+    <h3>写真を入れたのに紙面に出てこない</h3>
+    <p>KINARI（和・縦書き）と LUMIERE（コース）は、品目写真を表示しない設計です。
+      写真を見せたいなら ALBUM（写真メニュー）に切り替えてください。内容はそのまま残ります。</p>
+
+    <h3>作った内容が消えた</h3>
+    <p>ブラウザのデータ消去・プライベートモードでの利用・別のブラウザからのアクセスが原因です。
+      当方にデータの控えはないため復元できません。<code>.json</code> でのバックアップをおすすめします。</p>
+
+    <h3>書体が違って見える</h3>
+    <p>書体はインターネット経由で読み込みます。オフラインでも編集・印刷はできますが、
+      書体は端末標準のものに置き換わります。<b>オンラインで開く</b>のがおすすめです。
+      推奨ブラウザは <b>Chrome / Edge</b> です。</p>
+
+    <h3>スマホでも使える？</h3>
+    <p>閲覧とかんたんな修正はできます。じっくり作り込むときはパソコンをおすすめします。</p>
+
+    <p style="margin-top:20px"><a href="faq.html">→ よくある質問をすべて見る</a></p>
+  </section>
+
+  <section class="card">
+    <div style="text-align:center;padding:14px 0">
+      <h2 style="margin-bottom:14px">読むより、開いたほうが早いです</h2>
+      <p style="max-width:32em;margin:0 auto 24px">
+        サンプルを開いて、文字をひとつ打ちかえてみてください。だいたいそれで分かります。
+      </p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <a class="btn primary" href="./#cafe">カフェのサンプルを開く</a>
+        <a class="btn" href="./#washoku">縦書きの品書きを開く</a>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="pf">
+  <div class="pf-in">
+    <b>MenuFits</b>
+    <span class="sp"></span>
+    <a href="./">アプリ</a>
+    <a href="guide.html">使い方</a>
+    <a href="pro.html">料金・Proガイド</a>
+    <a href="faq.html">よくある質問</a>
+    <a href="releases.html">リリースノート</a>
+    <a href="privacy.html">プライバシー・免責</a>
+    <a href="tokushoho.html">特定商取引法に基づく表記</a>
+    <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
+  </div>
+</footer>
+</body>
+</html>
