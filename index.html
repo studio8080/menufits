@@ -1037,6 +1037,43 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
 }
 
 /* ============================================================
+   PRO（ロック表示）
+   ============================================================ */
+.probadge{
+  display:inline-block;font-style:normal;vertical-align:middle;
+  background:#26231c;color:#f2ead8;
+  font:600 8.5px/1 "Jost","Helvetica Neue",Arial,sans-serif;letter-spacing:.12em;
+  padding:3px 5px 2px;border-radius:3px;margin-left:6px;transform:translateY(-1px);
+}
+.dbtn.prolock .sw,.chip.prolock .pv,.chip.prolock .dv{opacity:.45}
+.chip.prolock b{color:#9a948a}
+.chip .probadge{margin-left:5px;font-size:7.5px;padding:2px 4px 1px}
+.prolock-row{opacity:.62}
+.prolock-row input[type=color]{cursor:pointer}
+#webProSection .prokey{
+  width:100%;box-sizing:border-box;margin-top:8px;padding:9px 10px;
+  border:1px solid var(--ui-line);border-radius:8px;background:#fff;
+  font:600 12.5px/1.4 "SFMono-Regular",Consolas,Menlo,monospace;letter-spacing:.08em;
+}
+#webProSection .promsg{margin-top:8px;font-size:11.5px;line-height:1.7;color:var(--ui-mut)}
+#webProSection .promsg.err{color:#8a3b17}
+#webProSection .proon{
+  margin-top:8px;padding:9px 11px;border-radius:8px;
+  background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.38);
+  font-size:12px;line-height:1.7;color:#4b4639;
+}
+.ttool .profield{
+  background:#26231c !important;color:#f2ead8 !important;
+  font:600 9px/1 "Jost","Helvetica Neue",Arial,sans-serif !important;letter-spacing:.12em;
+}
+.promodal-list{list-style:none;padding:0;margin:14px 0 0}
+.promodal-list li{position:relative;padding-left:1.5em;margin-bottom:8px;font-size:13px;line-height:1.8}
+.promodal-list li::before{content:"—";position:absolute;left:0;color:#a3785a}
+.promodal-list li.hit{font-weight:700;color:#232019}
+.promodal-price{font-family:var(--f-mincho);font-size:26px;font-weight:600;letter-spacing:.04em;margin:14px 0 2px}
+.promodal-price small{font-family:var(--f-gothic);font-size:12px;color:#8b8578;margin-left:8px;letter-spacing:.06em}
+
+/* ============================================================
    PRINT
    ============================================================ */
 @page{size:A4;margin:0}
@@ -1350,6 +1387,27 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
       </div>
     </div>
 
+    <div class="grp" id="webProSection">
+      <span class="lb">＿ MenuFits Pro</span>
+      <div id="proOffBox">
+        <div style="font-size:11.5px;color:var(--ui-mut);line-height:1.8">
+          デザイン全11種、書体378通り、表紙・冊子、自由配置、作り分け。<br>
+          買い切り <b>¥1,480</b>（月額ではありません）。
+        </div>
+        <div class="row" style="margin-top:9px">
+          <button class="btn primary" id="proBuyBtn">Pro を見る</button>
+        </div>
+        <input class="prokey" id="proKeyInput" type="text" placeholder="ライセンスキー（MNPRO-…）" autocomplete="off" spellcheck="false">
+        <div class="row" style="margin-top:8px">
+          <button class="btn" id="proUnlockBtn">解放する</button>
+        </div>
+        <div class="promsg" id="proMsg">購入済みの方は、キーを貼り付けて「解放する」を押してください。</div>
+      </div>
+      <div id="proOnBox" hidden>
+        <div class="proon"><b>MenuFits Pro が有効です。</b><br>すべての機能をお使いいただけます。</div>
+      </div>
+    </div>
+
     <div class="grp">
       <span class="lb">09 ＿ マイデータ（店舗・品目）</span>
       <div class="row">
@@ -1408,6 +1466,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <button id="fieldFsDown" title="文字を小さく">A−</button>
   <button id="fieldFsUp" title="文字を大きく">A＋</button>
   <button id="fieldReset" title="位置・大きさを元に戻す">↺</button>
+  <button id="fieldPro" class="profield" title="この文字を自由に動かす・大きさを変える（MenuFits Pro）" hidden>⠿ A± PRO</button>
 </div>
 
 <div class="mask" id="mask"><div class="modal" id="modal"></div></div>
@@ -1420,6 +1479,57 @@ const $  = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const uid = ()=>Math.random().toString(36).slice(2,9);
 const KEY = 'menu-template-v1';
+
+/* ============================================================
+   MenuFits Pro — ライセンスと、無料／Pro の切り分け
+   ------------------------------------------------------------
+   ライセンスの判定はこの端末のブラウザ内だけで行う（アカウントは無い）。
+   クライアント側だけの仕組みなので回避は完全には防げないが、それは
+   承知のうえの設計。目的は「Proの価値を伝えて買ってもらう」ことであり、
+   回避不能にすることではない。DRM的な作り込みは正直な利用者の体験だけを
+   損なう。判断の経緯は PRO-PLAN.md「切り分けの原則」を参照。
+   ============================================================ */
+const FUNCTIONS_BASE='https://us-central1-misefits.cloudfunctions.net';
+const VERIFY_URL=FUNCTIONS_BASE+'/menufitsVerifyLicense';
+const LICKEY='menufitsWebLicense', DEVKEY='menufitsDeviceId';
+// Stripe の Payment Link。**pro.html の同名定数と必ずそろえること。**
+// 空のあいだは決済ページへ飛ばさず「準備中」と案内する。
+const PRO_PURCHASE_URL='';
+const PRO_PRICE='¥1,480';
+
+// 無料で使える範囲。増減させたら pro.html の比較表も直すこと。
+const FREE_DESIGNS=['edit','kinari','noir','shu','grid'];
+const FREE_JP=['shippori','serifjp','gothic','noto','maru','klee','yuji','mochiy'];
+const FREE_EN=['cormorant','marcellus','playfair','jost','space','bebas'];
+const FREE_PAT=['','washi','seigaiha','dots','grid','stripe'];
+const FREE_DECO=['','frame','double'];
+const FREE_PAGES=2;   // 1枚もの＝1ページ、表裏＝2ページ。3ページ目からが冊子
+const FREE_SLOTS=1;
+
+/* ---- 販売開始スイッチ ------------------------------------------------
+   false のあいだは無料／Pro の切り分けが一切効かない（＝これまでどおり
+   全機能が使える）。ロックのコードは本番に置いたまま眠らせておける。
+
+   **Stripe の決済が実際に使えるようになるまで true にしないこと。**
+   先に true にすると「買えないのに機能だけロックされている」状態になり、
+   いまより明確に悪くなる。切り替えは PRO_PURCHASE_URL の設定と同時に。
+
+   不具合が出たときは false に戻すだけで、その場で元の挙動に戻せる。
+   -------------------------------------------------------------------- */
+const PRO_LAUNCHED=false;
+
+let proUnlocked=false;
+try{ proUnlocked = !!localStorage.getItem(LICKEY); }catch(e){}
+const isPro=()=>!PRO_LAUNCHED || proUnlocked;
+
+function deviceId(){
+  try{
+    let d=localStorage.getItem(DEVKEY);
+    if(!d){ d='d'+Math.random().toString(36).slice(2)+Date.now().toString(36);
+            localStorage.setItem(DEVKEY,d); }
+    return d;
+  }catch(e){ return ''; }
+}
 
 const DESIGNS = [
   {id:'noir',  nm:'NOIR',      jp:'ビストロ・バー',   sw:'linear-gradient(160deg,#2a2f39,#14161a)'},
@@ -2086,7 +2196,13 @@ document.addEventListener('click',e=>{
     }
     case 'ct-up' : mv(K,ci,-1); break;
     case 'ct-dn' : mv(K,ci, 1); break;
-    case 'ct-pg+': K[ci].page=(K[ci].page||1)+1; break;
+    case 'ct-pg+': {
+      // 無料は FREE_PAGES ページまで。行き止まりにしないよう、ここでは
+      // 「文字を小さく／2段組み」という別の手段が残っていることが前提。
+      const np=(K[ci].page||1)+1;
+      if(np>FREE_PAGES && proGate('page3')) return;
+      K[ci].page=np; break;
+    }
     case 'ct-pg-': K[ci].page=Math.max(1,(K[ci].page||1)-1); break;
     case 'it-add': items.splice(ii+1,0,newItem()); break;
     case 'it-del': purgePos('item::'+items[ii].id+'::'); if(items.length<=1) return; items.splice(ii,1); break;
@@ -2094,8 +2210,8 @@ document.addEventListener('click',e=>{
     case 'it-up' : mv(items,ii,-1); break;
     case 'it-dn' : mv(items,ii, 1); break;
     case 'it-badge': items[ii].badge = items[ii].badge ? '' : 'おすすめ'; break;
-    case 'it-lib': libAddItem(items[ii]); return;
-    case 'ct-lib': openLibPicker(ci); return;
+    case 'it-lib': if(proGate('itemlib')) return; libAddItem(items[ii]); return;
+    case 'ct-lib': if(proGate('itemlib')) return; openLibPicker(ci); return;
     case 'it-photo': photoTarget={ci,ii}; const pi=$('#photoInput'); pi.value=''; pi.click(); return;
     case 'it-photo-del': items[ii].photo=''; break;
     default: return;
@@ -2122,6 +2238,7 @@ document.addEventListener('click',e=>{
   const t=e.target.closest('[data-bact]'); if(!t) return;
   const act=t.dataset.bact;
   if(act==='add-text'||act==='add-image'){
+    if(proGate('block')) return;
     const pg=t.dataset.pg;
     const n=blocksOf(pg).length;
     const b={id:uid(),pg,type:act==='add-text'?'text':'image',
@@ -2194,12 +2311,90 @@ $('#stage').addEventListener('pointerdown',e=>{
   selectBlk(host?host.dataset.blk:null);
 },true);
 
+/* ---------------- Pro: 購入前モーダルとロック ---------------- */
+// ロック地点から必ずこれを呼ぶ。決済ページへ直行させず、触った機能の名前と
+// 値段・買い切りである点・解放される内容を見せてから送り出す。
+const PRO_FEATURE_LABELS={
+  design:'このデザイン', font_jp:'この和文書体', font_en:'この欧文書体',
+  pattern:'この背景パターン', deco:'この飾り枠',
+  color:'紙・文字・柄・枠の色調整', bgimg:'背景画像',
+  cover:'表紙・裏表紙', page3:'3ページ目以降',
+  block:'自由配置ブロック', fieldtool:'テンプレート文字の移動・拡大縮小',
+  slot:'2枠目以降のスロット保存', itemlib:'品目ライブラリ', shopprofile:'店舗プロフィール',
+};
+// モーダルの一覧。触った機能に対応する行を太字にする（data-f に対応するグループ名）。
+const PRO_ITEMS=[
+  ['design',  'デザインが全11種になる（今後の追加もそのまま使えます）'],
+  ['material','書体378通り・背景パターン23種・飾り枠9種。紙や文字の色も個別に調整'],
+  ['cover',   '表紙・裏表紙を付けて、3ページ以上の冊子にできる'],
+  ['layout',  '自由配置ブロックと、テンプレート文字のその場ドラッグ・拡大縮小'],
+  ['reuse',   'スロット保存が無制限に。品目ライブラリと店舗プロフィールも'],
+];
+const PRO_GROUP={
+  design:'design', font_jp:'material', font_en:'material', pattern:'material',
+  deco:'material', color:'material', bgimg:'material',
+  cover:'cover', page3:'cover', block:'layout', fieldtool:'layout',
+  slot:'reuse', itemlib:'reuse', shopprofile:'reuse',
+};
+
+function proBase(feature){ return String(feature).split(':')[0]; }
+
+// opts.freeAction を渡すと「無料で始める」ボタンを足せる。LPのデザイン一覧のように
+// まだ何も試していない人に当たる場所では、購入以外の出口を必ず用意する。
+function requestProPurchase(feature,opts){
+  trackEvent('pro_lock_hit',{feature:feature});
+  const base=proBase(feature);
+  const label=PRO_FEATURE_LABELS[base]||'この機能';
+  const grp=PRO_GROUP[base]||'';
+  openModal(`
+    <h2>${label}は MenuFits Pro の機能です</h2>
+    <p>いまお使いの機能はこれまでどおり無料のままです。Pro は、作り込みと作り分けのための上乗せです。</p>
+    <div class="promodal-price">${PRO_PRICE}<small>税込・買い切り</small></div>
+    <p style="font-size:12px;color:#8b8578;margin:2px 0 0">月額・年額の自動更新はありません。あとから増える機能も追加費用なしで使えます。</p>
+    <ul class="promodal-list">
+      ${PRO_ITEMS.map(([g,t])=>`<li class="${g===grp?'hit':''}" data-f="${g}">${t}</li>`).join('')}
+    </ul>
+    <div class="foot">
+      <button class="btn primary" id="proBuy">購入する（${PRO_PRICE}）</button>
+      ${opts&&opts.freeAction?`<button class="btn" id="proFree">${opts.freeLabel||'無料で始める'}</button>`:''}
+      <button class="btn" id="proDetail">詳しく見る</button>
+      <button class="btn" id="mClose">とじる</button>
+    </div>`);
+  const fr=$('#proFree'); if(fr) fr.onclick=()=>{
+    trackEvent('pro_free_start',{feature:feature});
+    mask.classList.remove('on');
+    opts.freeAction();
+  };
+  const buy=$('#proBuy'); if(buy) buy.onclick=()=>{
+    trackEvent('pro_buy_click',{feature:feature,location:'app_modal'});
+    if(!PRO_PURCHASE_URL){ toast('ただいま販売の準備中です。もう少しお待ちください'); return; }
+    location.href=PRO_PURCHASE_URL;
+  };
+  const det=$('#proDetail'); if(det) det.onclick=()=>{
+    trackEvent('pro_detail_click',{feature:feature});
+    location.href='pro.html';
+  };
+}
+
+// ロック判定のひとまとめ。true を返したらロックされている（＝呼び出し側は中断する）。
+function proGate(feature){
+  if(isPro()) return false;
+  requestProPurchase(feature);
+  return true;
+}
+
 /* ---------------- sidebar ---------------- */
 const dwrap=$('#designs');
 DESIGNS.forEach(d=>{
+  const locked=FREE_DESIGNS.indexOf(d.id)<0;
   const b=el('button','dbtn'+(state.design===d.id?' on':''));
-  b.innerHTML=`<span class="sw" style="background:${d.sw}"></span><span class="nm">${d.nm}<small>${d.jp}</small></span>`;
-  b.onclick=()=>{ state.design=d.id; save(); syncUI(); render(); };
+  b.dataset.pro=locked?'1':'';
+  b.innerHTML=`<span class="sw" style="background:${d.sw}"></span>`+
+    `<span class="nm">${d.nm}${locked?'<i class="probadge">PRO</i>':''}<small>${d.jp}</small></span>`;
+  b.onclick=()=>{
+    if(locked && proGate('design:'+d.id)) return;
+    state.design=d.id; save(); syncUI(); render();
+  };
   dwrap.appendChild(b);
 });
 const swrap=$('#swatches');
@@ -2210,8 +2405,30 @@ COLORS.forEach(c=>{
   swrap.appendChild(b);
 });
 $('#accentPick').oninput=e=>{ state.accent=e.target.value; save(); syncUI(); render(); };
-$('#fontJp').onchange=e=>{ state.fontJp=e.target.value; save(); render(); };
-$('#fontEn').onchange=e=>{ state.fontEn=e.target.value; save(); render(); };
+// 書体：Pro 側の option に印を付け、選ばれたら元の値へ戻してモーダルを出す。
+// （option 単位で disabled にすると「そんな書体がある」ことすら伝わらないので出しておく）
+function markProOptions(sel,freeList){
+  [...sel.options].forEach(o=>{
+    if(!o.value || freeList.indexOf(o.value)>=0) return;
+    o.dataset.pro='1';
+    if(o.textContent.indexOf('PRO')<0) o.textContent=o.textContent+'　🔒 PRO';
+  });
+}
+markProOptions($('#fontJp'),FREE_JP);
+markProOptions($('#fontEn'),FREE_EN);
+function wireFontSelect(sel,freeList,feature,key){
+  sel.onchange=e=>{
+    const v=e.target.value;
+    if(v && freeList.indexOf(v)<0 && !isPro()){
+      e.target.value=state[key]||'';   // 選択を戻してから案内する
+      requestProPurchase(feature+':'+v);
+      return;
+    }
+    state[key]=v; save(); render();
+  };
+}
+wireFontSelect($('#fontJp'),FREE_JP,'font_jp','fontJp');
+wireFontSelect($('#fontEn'),FREE_EN,'font_en','fontEn');
 const PATTERNS=[['','なし'],['washi','和紙'],['seigaiha','青海波'],['dots','水玉'],
   ['grid','方眼'],['stripe','斜線'],['check','市松'],['linen','リネン'],
   ['herr','杉綾'],['wave','波'],['diam','ダイヤ'],['zig','山道'],['rings','輪'],['cross','十字'],
@@ -2221,9 +2438,15 @@ const DECOS=[['','なし'],['frame','細枠'],['double','二重'],['corner','角
   ['stitch','点線'],['deco2','太枠'],['ticket','チケット'],['flor','花角']];
 const patWrap=$('#patChips');
 PATTERNS.forEach(([id,nm])=>{
-  const b=el('button','chip'); b.dataset.v=id; b.title='背景：'+nm;
-  b.innerHTML=(id?`<span class="pv pattern-w p-${id}" style="--ink:#3f382a;--pat-op:.5"></span>`:'')+`<b>${nm}</b>`;
-  b.onclick=()=>{ state.pattern=id; save(); syncUI(); render(); };
+  const locked=FREE_PAT.indexOf(id)<0;
+  const b=el('button','chip'); b.dataset.v=id; b.dataset.pro=locked?'1':'';
+  b.title=(locked&&PRO_LAUNCHED?'【PRO】':'')+'背景：'+nm;
+  b.innerHTML=(id?`<span class="pv pattern-w p-${id}" style="--ink:#3f382a;--pat-op:.5"></span>`:'')+
+    `<b>${nm}</b>`+(locked?'<i class="probadge">PRO</i>':'');
+  b.onclick=()=>{
+    if(locked && proGate('pattern:'+id)) return;
+    state.pattern=id; save(); syncUI(); render();
+  };
   patWrap.appendChild(b);
 });
 const COVER_STYLES=[
@@ -2248,14 +2471,23 @@ const coverStyleWrap=$('#coverStyleChips');
 COVER_STYLES.forEach(([id,nm,sw])=>{
   const b=el('button','chip'); b.dataset.v=id; b.title='表紙スタイル：'+nm;
   b.innerHTML=`<span class="pv" style="background:${sw}"></span><b>${nm}</b>`;
-  b.onclick=()=>{ state.coverStyle=id; save(); syncUI(); render(); };
+  b.onclick=()=>{
+    if(proGate('cover')) return;
+    state.coverStyle=id; save(); syncUI(); render();
+  };
   coverStyleWrap.appendChild(b);
 });
 const decoWrap=$('#decoChips');
 DECOS.forEach(([id,nm])=>{
-  const b=el('button','chip'); b.dataset.v=id; b.title='飾り枠：'+nm;
-  b.innerHTML=(id?`<span class="dv dv-${id}"></span>`:'')+`<b>${nm}</b>`;
-  b.onclick=()=>{ state.deco=id; save(); syncUI(); render(); };
+  const locked=FREE_DECO.indexOf(id)<0;
+  const b=el('button','chip'); b.dataset.v=id; b.dataset.pro=locked?'1':'';
+  b.title=(locked&&PRO_LAUNCHED?'【PRO】':'')+'飾り枠：'+nm;
+  b.innerHTML=(id?`<span class="dv dv-${id}"></span>`:'')+`<b>${nm}</b>`+
+    (locked?'<i class="probadge">PRO</i>':'');
+  b.onclick=()=>{
+    if(locked && proGate('deco:'+id)) return;
+    state.deco=id; save(); syncUI(); render();
+  };
   decoWrap.appendChild(b);
 });
 $('#patop').oninput=e=>{ state.patOp=+e.target.value; save();
@@ -2268,11 +2500,23 @@ $('#paty').oninput=e=>{ state.patY=+e.target.value; save();
   $$('.page').forEach(p=>p.style.setProperty('--pat-y',state.patY+'mm')); };
 $('#decoin').oninput=e=>{ state.decoIn=+e.target.value; save();
   $$('.page').forEach(p=>p.style.setProperty('--deco-in',state.decoIn+'mm')); };
+// 詳細パレット（紙・文字・柄・枠の個別上書き）は Pro。
+// color input は click では止められない（ネイティブのピッカーが開く）ので
+// pointerdown で先に止める。oninput 側にも保険を置く。
 $$('.cgrid input[type=color]').forEach(inp=>{
-  inp.oninput=()=>{ state.colors[inp.dataset.ck]=inp.value; save(); render(); };
+  inp.addEventListener('pointerdown',e=>{
+    if(!isPro()){ e.preventDefault(); inp.blur(); requestProPurchase('color'); }
+  });
+  inp.oninput=()=>{
+    if(!isPro()) return;
+    state.colors[inp.dataset.ck]=inp.value; save(); render();
+  };
 });
 $$('.cgrid .crst').forEach(b=>{
-  b.onclick=()=>{ state.colors[b.dataset.cr]=''; save(); syncUI(); render(); };
+  b.onclick=()=>{
+    if(proGate('color')) return;
+    state.colors[b.dataset.cr]=''; save(); syncUI(); render();
+  };
 });
 $('#colsel').onchange =e=>{ state.cols=+e.target.value; save(); render(); };
 $('#cursel').onchange =e=>{ state.cur=e.target.value; save(); render(); };
@@ -2310,8 +2554,17 @@ function hideTT(){ tt.hidden=true; }
 const ftool=$('#fieldTool');
 let fieldTarget=null;
 function hideFieldTool(){ ftool.hidden=true; fieldTarget=null; }
+// 無料版でも文字をクリックすればツールバーは出す。ただし中身は PRO の1ボタンだけに
+// 差し替える（機能の存在は伝わるが、押すまで邪魔をしない）。
+const FIELD_TOOL_BTNS=['fieldGrip','fieldFsDown','fieldFsUp','fieldReset'];
+function syncFieldToolPro(){
+  const free=!isPro();
+  FIELD_TOOL_BTNS.forEach(id=>{ const n=$('#'+id); if(n) n.hidden=free; });
+  const p=$('#fieldPro'); if(p) p.hidden=!free;
+}
 function showFieldTool(node){
   fieldTarget=node;
+  syncFieldToolPro();
   const r=node.getBoundingClientRect();
   ftool.hidden=false;
   ftool.style.left=Math.max(8,Math.min(innerWidth-ftool.offsetWidth-8,r.left))+'px';
@@ -2383,6 +2636,7 @@ function adjustFieldFs(delta){
   applyFieldOverride(node,ov);
   save(); showFieldTool(node);
 }
+$('#fieldPro').addEventListener('click',()=>{ hideFieldTool(); requestProPurchase('fieldtool'); });
 $('#fieldFsUp').addEventListener('click',()=>adjustFieldFs(1));
 $('#fieldFsDown').addEventListener('click',()=>adjustFieldFs(-1));
 $('#fieldReset').addEventListener('click',()=>{
@@ -2452,6 +2706,7 @@ function refreshShopLib(sel){
   if(sel) el2.value=sel;
 }
 $('#shopSaveBtn').onclick=()=>{
+  if(proGate('shopprofile')) return;
   const nm=prompt('登録名を入力してください',plain(state.shop.name)||'店舗');
   if(!nm) return;
   const sp=getSP();
@@ -2461,6 +2716,7 @@ $('#shopSaveBtn').onclick=()=>{
   catch(e){ toast('容量オーバー：ロゴ画像が大きい可能性があります'); }
 };
 $('#shopApplyBtn').onclick=()=>{
+  if(proGate('shopprofile')) return;
   const k=$('#shopSel').value; if(!k){ toast('プルダウンから店舗を選んでください'); return; }
   if(!confirm('店名・住所・ロゴを「'+k+'」の内容に置き換えます。よろしいですか？')) return;
   const p=getSP()[k]; if(!p) return;
@@ -2473,6 +2729,89 @@ $('#shopDelBtn').onclick=()=>{
   const sp=getSP(); delete sp[k]; localStorage.setItem(SPKEY,JSON.stringify(sp)); refreshShopLib();
 };
 refreshShopLib();
+
+/* ---------------- Pro: 解放UI と表示の同期 ---------------- */
+function syncProUI(){
+  const on=isPro();
+  // 販売開始前は Pro 欄そのものを出さない（売っていないものの案内を置かない）
+  const sec=$('#webProSection'); if(sec) sec.hidden=!PRO_LAUNCHED;
+  const off=$('#proOffBox'), onb=$('#proOnBox');
+  if(off) off.hidden=on;
+  if(onb) onb.hidden=!on;
+  // 解放したらバッジと鍵の印を消す（要素は作り直さない）
+  $$('[data-pro="1"] .probadge').forEach(n=>{ n.style.display=on?'none':''; });
+  [$('#fontJp'),$('#fontEn')].forEach(sel=>{
+    if(!sel) return;
+    [...sel.options].forEach(o=>{
+      if(!o.dataset.pro) return;
+      const base=o.textContent.replace(/\s*🔒 PRO$/,'');
+      o.textContent = on ? base : base+'　🔒 PRO';
+    });
+  });
+  const cg=$('.cgrid'); if(cg) cg.classList.toggle('prolock-row',!on);
+  syncFieldToolPro();
+}
+
+$('#proBuyBtn').onclick=()=>{
+  trackEvent('pro_buy_click',{feature:'sidebar',location:'sidebar'});
+  location.href='pro.html';
+};
+$('#proUnlockBtn').onclick=()=>{
+  const inp=$('#proKeyInput'), msg=$('#proMsg'), btn=$('#proUnlockBtn');
+  const key=(inp.value||'').trim().toUpperCase();
+  if(!key){ msg.classList.add('err'); msg.textContent='キーを入力してください。'; return; }
+  msg.classList.remove('err'); msg.textContent='確認しています…'; btn.disabled=true;
+  fetch(VERIFY_URL+'?key='+encodeURIComponent(key)+'&device='+encodeURIComponent(deviceId()))
+    .then(r=>r.json().catch(()=>({})))
+    .then(j=>{
+      btn.disabled=false;
+      if(j&&j.valid){
+        try{ localStorage.setItem(LICKEY,key); }catch(e){}
+        proUnlocked=true;
+        trackEvent('license_unlock_success',{location:'app'});
+        syncProUI(); syncUI(); render();
+        toast('MenuFits Pro を解放しました');
+        return;
+      }
+      const reason=(j&&j.reason)||'invalid';
+      trackEvent('license_unlock_fail',{location:'app',reason:reason});
+      msg.classList.add('err');
+      msg.textContent = reason==='device_limit'
+        ? '解放できる台数（5台）の上限に達しています。お問い合わせいただければリセットします。'
+        : 'このキーは確認できませんでした。入力内容をご確認ください。';
+    })
+    .catch(()=>{
+      btn.disabled=false;
+      trackEvent('license_unlock_fail',{location:'app',reason:'network'});
+      msg.classList.add('err');
+      msg.textContent='通信に失敗しました。ネットワークをご確認のうえ、もう一度お試しください。';
+    });
+};
+
+// 読み込んだデータに Pro の設定が含まれているかどうか。
+// **含まれていても降格させない**（作ったものを壊さない）。表示と印刷はそのまま通し、
+// Pro 要素を「変更しようとした」ときだけロックする。理由は PRO-PLAN.md を参照。
+function dataHasPro(s){
+  if(!s) return false;
+  if(s.design && FREE_DESIGNS.indexOf(s.design)<0) return true;
+  if(s.fontJp && FREE_JP.indexOf(s.fontJp)<0) return true;
+  if(s.fontEn && FREE_EN.indexOf(s.fontEn)<0) return true;
+  if(s.pattern && FREE_PAT.indexOf(s.pattern)<0) return true;
+  if(s.deco && FREE_DECO.indexOf(s.deco)<0) return true;
+  if(s.colors && (s.colors.paper||s.colors.ink||s.colors.pat||s.colors.deco)) return true;
+  if(s.bgImg) return true;
+  if(s.cover && (s.cover.front||s.cover.back)) return true;
+  if(Array.isArray(s.blocks) && s.blocks.length) return true;
+  if(s.pos && Object.keys(s.pos).length) return true;
+  if(Math.max(1,...(s.categories||[]).map(c=>c.page||1))>FREE_PAGES) return true;
+  return false;
+}
+function noticeProData(s){
+  if(isPro() || !dataHasPro(s)) return;
+  toast('このデータには Pro の設定が含まれています。表示と印刷はそのままできます');
+}
+
+syncProUI();
 
 /* --- collapsible sidebar groups --- */
 $$('.side .grp').forEach((g,gi)=>{
@@ -2505,9 +2844,20 @@ $('#heroInput').onchange=e=>{
   shrink(f,1600,.84,d=>{ state.hero=d; save(); render(); });
 };
 $('#heroDel').onclick=()=>{ state.hero=null; save(); render(); };
-$('#coverFrontBtn').onclick=()=>{ state.cover.front=!state.cover.front; save(); syncUI(); render(); };
-$('#coverBackBtn').onclick=()=>{ state.cover.back=!state.cover.back; save(); syncUI(); render(); };
-$('#bgBtn').onclick=()=>{ const b=$('#bgInput'); b.value=''; b.click(); };
+// 表紙・裏表紙は Pro。ただし「外す」操作はいつでも通す
+// （Pro で付けた表紙を、ライセンスが切れた端末で外せなくなると詰むため）。
+$('#coverFrontBtn').onclick=()=>{
+  if(!state.cover.front && proGate('cover')) return;
+  state.cover.front=!state.cover.front; save(); syncUI(); render();
+};
+$('#coverBackBtn').onclick=()=>{
+  if(!state.cover.back && proGate('cover')) return;
+  state.cover.back=!state.cover.back; save(); syncUI(); render();
+};
+$('#bgBtn').onclick=()=>{
+  if(proGate('bgimg')) return;
+  const b=$('#bgInput'); b.value=''; b.click();
+};
 $('#bgInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   shrink(f,1700,.84,d=>{ state.bgImg=d; save(); render(); });
@@ -2532,6 +2882,9 @@ $('#slotSaveBtn').onclick=()=>{
   const nm=prompt('保存名を入力してください',(state.shop.name||'メニュー'));
   if(!nm) return;
   const slots=getSlots();
+  // 無料は FREE_SLOTS 枠まで。既存枠への上書きはいつでも通す
+  // （枠が埋まったあと、その1枠すら更新できなくなるのは理不尽なので）。
+  if(!slots[nm] && Object.keys(slots).length>=FREE_SLOTS && proGate('slot')) return;
   if(slots[nm] && !confirm('「'+nm+'」を上書きしますか？')) return;
   slots[nm]={ts:Date.now(),state:JSON.parse(JSON.stringify(state))};
   try{ localStorage.setItem(SLOTKEY,JSON.stringify(slots)); refreshSlots(nm); }
@@ -2541,7 +2894,7 @@ $('#slotLoadBtn').onclick=()=>{
   const k=$('#slotSel').value; if(!k) return;
   if(!confirm('「'+k+'」を開きます。いま編集中の内容は置き換わります。よろしいですか？')) return;
   state=migrate(JSON.parse(JSON.stringify(getSlots()[k].state)));
-  save(); syncUI(); render(); resetHistory();
+  save(); syncUI(); render(); resetHistory(); noticeProData(state);
 };
 $('#slotDelBtn').onclick=()=>{
   const k=$('#slotSel').value; if(!k) return;
@@ -2561,7 +2914,7 @@ $('#impBtn').onclick=()=>$('#impInput').click();
 $('#impInput').onchange=e=>{
   const f=e.target.files[0]; if(!f) return;
   const r=new FileReader();
-  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.categories) throw 0; state=migrate(o); save(); syncUI(); render(); resetHistory(); }
+  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.categories) throw 0; state=migrate(o); save(); syncUI(); render(); resetHistory(); noticeProData(state); }
     catch(err){ alert('このファイルは読み込めませんでした。'); } };
   r.readAsText(f);
 };
@@ -2678,15 +3031,33 @@ function showApp(){ document.body.classList.remove('lp-mode'); document.body.cla
 function showLP(){ document.body.classList.remove('app-mode'); document.body.classList.add('lp-mode'); window.scrollTo(0,0); }
 const DSAMPLE={kinari:'washoku',shu:'chuka',noir:'bistro',split:'bistro',asia:'chuka'};
 const lpD=$('#lpDesigns');
+function openDesignSample(id){
+  state=fresh(DSAMPLE[id]||'cafe'); state.design=id;
+  save(); syncUI(); render(); resetHistory(); showApp();
+}
 if(lpD) DESIGNS.forEach(d=>{
+  const locked=FREE_DESIGNS.indexOf(d.id)<0;
   const b=el('button','dbtn');
-  b.innerHTML=`<span class="sw" style="background:${d.sw}"></span><span class="nm">${d.nm}<small>${d.jp}</small></span>`;
+  b.dataset.pro=locked?'1':'';
+  b.innerHTML=`<span class="sw" style="background:${d.sw}"></span>`+
+    `<span class="nm">${d.nm}${locked?'<i class="probadge">PRO</i>':''}<small>${d.jp}</small></span>`;
   b.onclick=()=>{
+    // LPは「まだ何も試していない人」が触る場所。買うか帰るかの二択にしない。
+    if(locked && !isPro()){
+      requestProPurchase('design:'+d.id,{
+        freeLabel:'無料のデザインで始める',
+        freeAction:()=>openDesignSample('edit'),
+      });
+      return;
+    }
     if(localStorage.getItem(KEY) && !confirm('前回の編集内容ではなく、「'+d.nm+'」のサンプルを開きますか？（キャンセル＝編集中の内容のまま）')) return;
-    state=fresh(DSAMPLE[d.id]||'cafe'); state.design=d.id; save(); syncUI(); render(); resetHistory(); showApp();
+    openDesignSample(d.id);
   };
   lpD.appendChild(b);
 });
+// LPのデザイン一覧はサイドバーより後に組み立てるので、ここでもう一度そろえる
+// （販売開始前は、ここで PRO バッジが消える）。
+syncProUI();
 $$('.lpstart').forEach(b=>b.onclick=()=>{
   const k=b.dataset.sample;
   const msg=k==='blank' ? '編集中の内容を消して、白紙から始めますか？' : '前回の編集内容ではなく、サンプルから始めますか？（キャンセル＝前回の続き）';
