@@ -1036,6 +1036,16 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   .mfoot:hover [contenteditable]:empty,.mfoot:focus-within [contenteditable]:empty{display:block}
 }
 
+/* ---------- サイドバー最下部の導線 ---------- */
+.sidefoot{
+  display:flex;flex-wrap:wrap;gap:5px 12px;
+  margin:16px 0 4px;padding-top:13px;
+  border-top:1px solid var(--ui-line);
+  font-size:11px;line-height:1.9;letter-spacing:.03em;
+}
+.sidefoot a{color:var(--ui-mut);text-decoration:none}
+.sidefoot a:hover{color:var(--ui-ink);text-decoration:underline;text-underline-offset:2px}
+
 /* ============================================================
    PRO（ロック表示）
    ============================================================ */
@@ -1448,6 +1458,18 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
       内容は自動でこのブラウザに保存されます。<br>
       操作を間違えたら <b>Ctrl+Z</b>（元に戻す）。
     </div>
+
+    <!-- アプリ画面の導線。一度でも使った人は次回から直接この画面が開くため、
+         LP（＝フッター）を経由しない。有料販売をしている以上、特商法・
+         プライバシーポリシーへの導線がこの画面にも必要。 -->
+    <nav class="sidefoot">
+      <a href="pro.html">料金・Pro</a>
+      <a href="faq.html">よくある質問</a>
+      <a href="releases.html">更新履歴</a>
+      <a href="privacy.html">プライバシー・免責</a>
+      <a href="tokushoho.html">特定商取引法に基づく表記</a>
+      <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
+    </nav>
   </aside>
 
   <div class="stagewrap">
@@ -1855,6 +1877,14 @@ function set(p,v){ const ks=p.split('.'), last=ks.pop(); ks.reduce((o,k)=>o[k],s
 /* ---------------- dom helpers ---------------- */
 function el(tag,cls,txt){ const n=document.createElement(tag); if(cls)n.className=cls; if(txt!=null)n.textContent=txt; return n; }
 function plain(html){ const d=document.createElement('div'); d.innerHTML=html||''; return d.textContent; }
+// plain() の戻り値は「タグを剥がしたテキスト」だが、元が &lt;img&gt; のように
+// エスケープされていると `<img ...>` という**文字列**になる。これをそのまま
+// HTML文字列に連結すると、もう一度タグとして解釈されてしまう（二重デコード）。
+// HTMLに差し込むときは必ずこれを通すこと。
+function escHTML(s){
+  return String(s==null?'':s).replace(/[&<>"']/g,
+    c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function sanitizeHTML(html){
   const d=document.createElement('div'); d.innerHTML=html||'';
   (function walk(node){
@@ -2689,8 +2719,8 @@ function openLibPicker(ci){
   const lib=getIL();
   if(!lib.length){ toast('ライブラリは空です。品目の ☆ から登録できます'); return; }
   openModal('<h2>品目ライブラリから挿入</h2><div class="liblist">'+lib.map((l,i)=>
-    '<div class="librow"><button class="btn" data-ins="'+i+'">'+(plain(l.name)||'（無名）')+
-    '<small>　'+plain(l.price)+'</small></button><button class="btn dgx" data-ldel="'+i+'">✕</button></div>'
+    '<div class="librow"><button class="btn" data-ins="'+i+'">'+escHTML(plain(l.name)||'（無名）')+
+    '<small>　'+escHTML(plain(l.price))+'</small></button><button class="btn dgx" data-ldel="'+i+'">✕</button></div>'
   ).join('')+'</div><div class="foot"><button class="btn" id="mClose">とじる</button></div>');
   modal.onclick=e=>{
     const ins=e.target.closest('[data-ins]'), del=e.target.closest('[data-ldel]');
