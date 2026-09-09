@@ -3192,9 +3192,17 @@ $$('[data-share]').forEach(b=>b.onclick=()=>{
 // deep links: #cafe / #washoku / #bistro / #chuka / #blank open that sample、#app はエディタ。
 // #d-<デザインID>（例 #d-kinari）は、そのデザインで近いサンプルを開く。
 // templates.html などの静的ページから、狙ったデザインへ直接送るために使う。
+function applyDeepLink(){
 const H=(location.hash||'').replace('#','');
 const HD=H.slice(0,2)==='d-' ? H.slice(2) : '';
-if(SAMPLES[H]){ state=fresh(H); save(); syncUI(); render(); showApp(); }
+if(SAMPLES[H]){
+  // 編集中の内容がある人を、確認なしに巻き戻さない（#d-… の分岐と同じ扱い）。
+  let saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
+  const ok = !saved ||
+    confirm('前回の編集内容ではなく、サンプルを開きますか？（キャンセルで編集中の内容のまま）');
+  if(ok){ state=fresh(H); save(); syncUI(); render(); }
+  showApp();
+}
 else if(HD && DESIGNS.some(d=>d.id===HD)){
   // Proのデザインを指されたときは、無料のデザインで開いたうえで購入の案内を出す。
   // 「押したのに何も起きない」を避ける（LPのデザインボタンと同じ考え方）。
@@ -3211,6 +3219,11 @@ else if(HD && DESIGNS.some(d=>d.id===HD)){
 }
 else if(H==='app'){ showApp(); }
 else if(localStorage.getItem(KEY)) showApp();
+}
+applyDeepLink();
+// 同じページを開いたままハッシュだけ変わったとき（記事やガイドのリンクを
+// 続けて押した場合など）にも反映する。これが無いと2つ目のリンクが無反応に見える。
+addEventListener('hashchange', applyDeepLink);
 
 /* ---------------- go ---------------- */
 syncUI(); render();
