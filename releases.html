@@ -45,6 +45,12 @@
   .tag.imp{background:rgba(28,25,18,.06);color:var(--ink-soft);border:1px solid var(--line-2)}
   .tag.fix{background:rgba(201,162,39,.16);color:#7a5a2e;border:1px solid rgba(201,162,39,.4)}
 </style>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"MenuFits","item":"https://menufits.kokokikaku.com/"},
+ {"@type":"ListItem","position":2,"name":"リリースノート","item":"https://menufits.kokokikaku.com/releases.html"}
+]}
+</script>
 </head>
 <body>
 
@@ -87,6 +93,16 @@
 
   <section class="card">
     <div class="rel">
+      <div class="date">2026-09-04</div>
+      <ul>
+        <li><span class="tag new">NEW</span><span><b><a href="templates.html">メニュー表テンプレート一覧</a></b>のページを公開しました。11種類のデザインを業態から選び、押すとそのデザインのサンプルが入った状態で編集画面がひらきます。</span></li>
+        <li><span class="tag new">NEW</span><span>業態別のつくり方を4ページ追加しました。<a href="menu-cafe.html">カフェ</a>／<a href="menu-izakaya.html">居酒屋</a>／<a href="menu-washoku.html">和食（縦書き）</a>／<a href="menu-chuka.html">中華・ラーメン</a>。並べ方や価格の書き方など、その業態でつまずきやすいところをまとめています。</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="rel">
       <div class="date">2026-09-01</div>
       <ul>
         <li><span class="tag new">NEW</span><span><b>元に戻す・やり直す</b>を追加しました。左パネル上部のボタン、または <b>Ctrl+Z</b>（Mac は <b>⌘Z</b>）／ <b>Ctrl+Shift+Z</b> でお使いいただけます。文字の打ち替え・ドラッグでの移動・削除・デザイン変更まで、ひととおりの操作が対象です。</span></li>
@@ -109,7 +125,7 @@
     <div class="rel">
       <div class="date">2026-08-21</div>
       <ul>
-        <li><span class="tag new">NEW</span><span><b>MenuFits v1.0 を公開しました。</b>デザイン11種、和文21種×欧文18種の書体、背景パターン23種、飾り枠9種、縦書き・写真メニュー・文字装飾、品目ライブラリ、店舗プロフィール、A4のPDF出力。</span></li>
+        <li><span class="tag new">NEW</span><span><b>MenuFits v1.0 を公開しました。</b>デザイン11種、和文21種×欧文18種の書体、背景パターン23種、飾り枠8種、縦書き・写真メニュー・文字装飾、品目ライブラリ、店舗プロフィール、A4のPDF出力。</span></li>
         <li><span class="tag imp">IMPROVED</span><span>スマートフォンでの使い勝手を改善しました（紙面を先頭に表示、設定パネルの折りたたみ）。</span></li>
         <li><span class="tag imp">IMPROVED</span><span>URL の後ろに <code>#cafe</code> ／ <code>#washoku</code> ／ <code>#bistro</code> ／ <code>#chuka</code> を付けると、そのサンプルを直接開けるようにしました。</span></li>
         <li><span class="tag fix">FIXED</span><span>PDF・画像出力で「おすすめ」バッジの背景色が消える不具合を修正しました。</span></li>
@@ -128,11 +144,14 @@
   </section>
 </main>
 
+
+
 <footer class="pf">
   <div class="pf-in">
     <b>MenuFits</b>
     <span class="sp"></span>
     <a href="./">アプリ</a>
+    <a href="templates.html">テンプレート</a>
     <a href="guide.html">使い方</a>
     <a href="pro.html">料金・Proガイド</a>
     <a href="faq.html">よくある質問</a>

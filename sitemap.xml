@@ -2,12 +2,37 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://menufits.kokokikaku.com/</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/guide.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/templates.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/menu-cafe.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/menu-izakaya.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/menu-washoku.html</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/menu-chuka.html</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
@@ -33,6 +58,26 @@
   <url>
     <loc>https://menufits.kokokikaku.com/tokushoho.html</loc>
     <lastmod>2026-09-01</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/samples/menu-cafe-sample.pdf</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/samples/menu-washoku-sample.pdf</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/samples/menu-bistro-sample.pdf</loc>
+    <lastmod>2026-09-04</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/samples/menu-chuka-sample.pdf</loc>
+    <lastmod>2026-09-04</lastmod>
     <changefreq>yearly</changefreq>
   </url>
 </urlset>

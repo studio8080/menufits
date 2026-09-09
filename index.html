@@ -129,6 +129,27 @@ body.app-mode #lp{display:none}
 .lpfeat b{display:block;font-size:15px;letter-spacing:.1em;margin-bottom:9px}
 .lpfeat p{margin:0;font-size:13px;line-height:1.95;color:#6c675b}
 .lpdesigns{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-top:8px}
+.lplinks{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;margin-top:26px}
+.lpplans{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px;text-align:left}
+.lpplan{background:#fffdf8;border:1px solid rgba(28,25,18,.08);border-radius:16px;padding:26px 26px 28px;display:flex;flex-direction:column}
+.lpplan.hi{border-color:rgba(28,25,18,.18);box-shadow:0 1px 2px rgba(28,25,18,.05),0 16px 40px rgba(28,25,18,.1)}
+.lpplan .ttl{font-family:var(--f-en-sans);font-size:12.5px;font-weight:600;letter-spacing:.22em;color:#a3785a;margin-bottom:10px}
+.lpplan .price{font-family:var(--f-mincho);font-size:30px;font-weight:600;letter-spacing:.04em;line-height:1.3}
+.lpplan .price small{font-size:12.5px;font-family:inherit;color:#8b8578;letter-spacing:.06em;margin-left:8px}
+.lpplan .lead{margin:8px 0 18px;font-size:12.5px;color:#6c675b;line-height:1.9}
+.lpplan ul{list-style:none;padding:0;margin:0 0 20px}
+.lpplan li{position:relative;padding-left:1.5em;margin-bottom:8px;font-size:13px;line-height:1.85;color:#4b4639}
+.lpplan li::before{content:"—";position:absolute;left:0;color:#a3785a}
+.lpplan .sp{flex:1}
+.lpplan .lpbtn{display:inline-flex;align-items:center;justify-content:center;
+  width:100%;box-sizing:border-box;text-decoration:none;text-align:center}
+.lpplan .fine{margin:12px 0 0;font-size:11.5px;color:#8b8578;line-height:1.8}
+.lplinks a{display:block;text-decoration:none;color:inherit;background:#fffdf8;
+  border:1px solid rgba(28,25,18,.08);border-radius:14px;padding:18px 20px;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.lplinks a:hover{transform:translateY(-2px);box-shadow:0 2px 4px rgba(28,25,18,.07),0 12px 26px rgba(28,25,18,.1)}
+.lplinks b{display:block;font-size:14.5px;letter-spacing:.1em;margin-bottom:5px}
+.lplinks span{display:block;font-size:12.5px;line-height:1.85;color:#6c675b}
 .lpdesigns .dbtn .sw{height:56px}
 .lpsteps{list-style:none;counter-reset:st;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
 .lpsteps li{counter-increment:st;background:#fffdf8;border:1px solid rgba(28,25,18,.08);border-radius:14px;padding:20px;text-align:center}
@@ -147,7 +168,8 @@ body.app-mode #lp{display:none}
 .lprow span{color:#c3beb2}
 .lpc{font-size:11.5px;color:#a39d90;letter-spacing:.08em;padding-bottom:10px}
 @media screen and (max-width:720px){
-  .lpfeat,.lpsteps{grid-template-columns:1fr}
+  .lpfeat,.lpsteps,.lpplans{grid-template-columns:1fr}
+  .lpplan{padding:22px 20px 24px}
   .pcbr{display:none}
 }
 
@@ -1157,6 +1179,41 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
     <p class="lpsub">クリックすると、そのデザインのサンプルが開きます。</p>
     <div class="lpdesigns" id="lpDesigns"></div>
   </section>
+  <section class="lpsec" id="lpPricing">
+    <h2>料金</h2>
+    <p class="lpsub">1枚のメニューを作ってA4のPDFにするところまで、ずっと無料です。</p>
+    <div class="lpplans">
+      <div class="lpplan">
+        <div class="ttl">FREE</div>
+        <div class="price">¥0<small>ずっと無料</small></div>
+        <p class="lead">登録も透かしもなし。まずはここから。</p>
+        <ul>
+          <li>デザイン5種・書体48通り</li>
+          <li>紙面の文字を直接打ちかえ、写真・文字装飾</li>
+          <li>2ページまで（1枚もの・表裏）</li>
+          <li><b>A4のPDF出力（透かしなし・回数無制限）</b></li>
+          <li>.json ファイルへの書き出し・読み込み</li>
+        </ul>
+        <div class="sp"></div>
+        <button class="lpbtn lpstart" data-sample="cafe">無料で作ってみる</button>
+      </div>
+      <div class="lpplan hi">
+        <div class="ttl">PRO</div>
+        <div class="price">¥1,480<small>税込・買い切り</small></div>
+        <p class="lead">作り込みと作り分けのための上乗せ。月額課金ではありません。</p>
+        <ul>
+          <li>デザイン全11種・書体378通り</li>
+          <li>背景パターン23種・飾り枠8種、色の個別調整</li>
+          <li>表紙・裏表紙と3ページ以上の冊子</li>
+          <li>自由配置のテキスト・画像ブロック</li>
+          <li>スロット保存が無制限、品目ライブラリ、店舗プロフィール</li>
+        </ul>
+        <div class="sp"></div>
+        <a class="lpbtn primary" href="pro.html">料金・Proガイドを見る</a>
+        <p class="fine">1つのキーで最大5台まで。あとから増える機能も追加費用なしで使えます。</p>
+      </div>
+    </div>
+  </section>
   <section class="lpsec">
     <h2>使い方は３ステップ</h2>
     <ol class="lpsteps">
@@ -1166,6 +1223,17 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
     </ol>
     <div class="lpcta bottom">
       <button class="lpbtn primary lpstart" data-sample="cafe">今すぐ作ってみる</button>
+    </div>
+  </section>
+  <section class="lpsec">
+    <h2>業態別のつくり方</h2>
+    <p class="lpsub">その業態でしかつまずかないところを、別ページにまとめてあります。</p>
+    <div class="lplinks">
+      <a href="templates.html"><b>メニュー表テンプレート一覧</b><span>11種類のデザインを、業態から選ぶ</span></a>
+      <a href="menu-cafe.html"><b>カフェのメニュー表</b><span>ドリンクの並べ方、ホットとアイス、サイズ違い</span></a>
+      <a href="menu-izakaya.html"><b>居酒屋の品書き</b><span>品数が多いときの絞り方、飲み放題とお通し</span></a>
+      <a href="menu-washoku.html"><b>和食のお品書き</b><span>縦書きの組み方、価格の縦中横、献立の並び順</span></a>
+      <a href="menu-chuka.html"><b>中華・ラーメンのメニュー</b><span>写真を使う判断、セットの見せ方、辛さの表記</span></a>
     </div>
   </section>
   <section class="lpsec">
@@ -1186,6 +1254,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <footer class="lpfoot">
     <div class="lprow">
       <a href="#" id="lpHelp">使い方</a><span>・</span>
+      <a href="templates.html">テンプレート</a><span>・</span>
       <a href="guide.html">使い方ガイド</a><span>・</span>
       <a href="pro.html">料金・Proガイド</a><span>・</span>
       <a href="faq.html">よくある質問</a><span>・</span>
@@ -2361,7 +2430,7 @@ const PRO_FEATURE_LABELS={
 // モーダルの一覧。触った機能に対応する行を太字にする（data-f に対応するグループ名）。
 const PRO_ITEMS=[
   ['design',  'デザインが全11種になる（今後の追加もそのまま使えます）'],
-  ['material','書体378通り・背景パターン23種・飾り枠9種。紙や文字の色も個別に調整'],
+  ['material','書体378通り・背景パターン23種・飾り枠8種。紙や文字の色も個別に調整'],
   ['cover',   '表紙・裏表紙を付けて、3ページ以上の冊子にできる'],
   ['layout',  '自由配置ブロックと、テンプレート文字のその場ドラッグ・拡大縮小'],
   ['reuse',   'スロット保存が無制限に。品目ライブラリと店舗プロフィールも'],
@@ -2775,6 +2844,8 @@ function syncProUI(){
   const on=isPro();
   // 販売開始前は Pro 欄そのものを出さない（売っていないものの案内を置かない）
   const sec=$('#webProSection'); if(sec) sec.hidden=!PRO_LAUNCHED;
+  // LPの料金セクションも同じ扱い（売っていないものの価格を出さない）
+  const lpp=$('#lpPricing'); if(lpp) lpp.hidden=!PRO_LAUNCHED;
   const off=$('#proOffBox'), onb=$('#proOnBox');
   if(off) off.hidden=on;
   if(onb) onb.hidden=!on;
@@ -3118,9 +3189,26 @@ $$('[data-share]').forEach(b=>b.onclick=()=>{
   else if(t==='line') window.open('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(SHARE_URL),'_blank','noopener');
   else if(t==='copy'){ try{ navigator.clipboard.writeText(SHARE_URL); toast('リンクをコピーしました'); }catch(e){ toast(SHARE_URL); } }
 });
-// deep links: #cafe / #washoku / #bistro / #chuka / #blank open that sample, #app opens the editor
+// deep links: #cafe / #washoku / #bistro / #chuka / #blank open that sample、#app はエディタ。
+// #d-<デザインID>（例 #d-kinari）は、そのデザインで近いサンプルを開く。
+// templates.html などの静的ページから、狙ったデザインへ直接送るために使う。
 const H=(location.hash||'').replace('#','');
+const HD=H.slice(0,2)==='d-' ? H.slice(2) : '';
 if(SAMPLES[H]){ state=fresh(H); save(); syncUI(); render(); showApp(); }
+else if(HD && DESIGNS.some(d=>d.id===HD)){
+  // Proのデザインを指されたときは、無料のデザインで開いたうえで購入の案内を出す。
+  // 「押したのに何も起きない」を避ける（LPのデザインボタンと同じ考え方）。
+  const locked = FREE_DESIGNS.indexOf(HD)<0 && !isPro();
+  const nm = (DESIGNS.find(d=>d.id===HD)||{}).nm || '';
+  // 編集中の内容がある人を、確認なしに巻き戻さない（LPのデザインボタンと同じ）。
+  let saved=null; try{ saved=localStorage.getItem(KEY); }catch(e){}
+  const ok = !saved ||
+    confirm('前回の編集内容ではなく、「'+nm+'」のサンプルを開きますか？（キャンセル＝編集中の内容のまま）');
+  if(ok){
+    openDesignSample(locked ? 'edit' : HD);
+    if(locked) requestProPurchase('design:'+HD,{ freeLabel:'無料のデザインで続ける', freeAction:()=>{} });
+  } else { showApp(); }
+}
 else if(H==='app'){ showApp(); }
 else if(localStorage.getItem(KEY)) showApp();
 

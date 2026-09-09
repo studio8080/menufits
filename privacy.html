@@ -29,6 +29,12 @@
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="page.css">
 <script src="analytics.js"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[
+ {"@type":"ListItem","position":1,"name":"MenuFits","item":"https://menufits.kokokikaku.com/"},
+ {"@type":"ListItem","position":2,"name":"プライバシー・免責","item":"https://menufits.kokokikaku.com/privacy.html"}
+]}
+</script>
 </head>
 <body>
 
@@ -83,7 +89,7 @@
     <ul>
       <li>下のオプトアウト設定を「送信しない」にしているとき</li>
       <li>ブラウザの「Do Not Track」を有効にしているとき</li>
-      <li>測定IDが未設定のとき（現在の状態。設定するまで解析は動きません）</li>
+      <li>ブラウザの拡張機能などで、解析用のスクリプトが読み込めないとき</li>
     </ul>
 
     <h3>3. 決済（Stripe）</h3>
@@ -94,6 +100,23 @@
       解放した端末を数えるためのランダムなID（<code>menufitsDeviceId</code>）だけです。
       これらはライセンスキーの発行・再発行・台数管理のために利用し、他の目的には使いません。
       無料のままお使いの場合、この通信は発生しません。</p>
+
+    <h3>4. 広告（アフィリエイト）</h3>
+    <p>本サイトの一部のページ（使い方ガイド・よくある質問・業態別の解説ページなど）では、
+      運営費をまかなうためにアフィリエイト広告を掲載することがあります。
+      掲載している箇所には<b>「広告」と明示</b>します。</p>
+    <p>現在利用しているのは
+      <a href="https://www.moshimo.co.jp/company/privacy" target="_blank" rel="noopener">もしもアフィリエイト（株式会社もしも）</a>
+      です。広告が表示されるとき、同社および広告主が、広告の表示回数や成果の計測のために
+      Cookie を設定したり、IPアドレス・ブラウザの情報を取得したりすることがあります。
+      <b>入力されたメニューの内容・写真・店名などが広告事業者に渡ることはありません。</b></p>
+    <p>次の場合、広告は表示されず、広告事業者への通信も発生しません。</p>
+    <ul>
+      <li><b>MenuFits Pro を購入済みのとき</b>（このブラウザにライセンスキーが保存されている場合）</li>
+      <li>下のオプトアウト設定を「送信しない」にしているとき</li>
+      <li>ブラウザの「Do Not Track」を有効にしているとき</li>
+    </ul>
+    <p>アプリ本体（メニューの編集画面）には広告を出しません。</p>
   </section>
 
   <section class="card">
@@ -112,7 +135,8 @@
     <h2>Cookie について</h2>
     <p>MenuFits 自身は Cookie を使いません。編集内容の保存には localStorage を使います。
       アクセス解析が有効な場合に限り、Google Analytics が計測用の Cookie を設定します。
-      上のオプトアウトを設定すれば、この Cookie も発行されません。</p>
+      広告が表示されるページでは、広告配信事業者が計測用の Cookie を設定することがあります。
+      上のオプトアウトを設定すれば、いずれの Cookie も発行されません。</p>
   </section>
 
   <section class="card">
@@ -141,6 +165,7 @@
     <b>MenuFits</b>
     <span class="sp"></span>
     <a href="./">アプリ</a>
+    <a href="templates.html">テンプレート</a>
     <a href="guide.html">使い方</a>
     <a href="pro.html">料金・Proガイド</a>
     <a href="faq.html">よくある質問</a>
