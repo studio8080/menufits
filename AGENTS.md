@@ -48,6 +48,7 @@ page.css          静的サブページの共通スタイル
 analytics.js      GA4ローダーと trackEvent() ラッパー
 ads.js            記事中の広告枠（アフィリエイト）。先頭の ENABLED で全ページ一括で止められる
 articles.html     読みもの（記事一覧）。登録なしで読めることを明示するハブ
+googleb736d92e1fe0566c.html  Search Console の所有権確認ファイル。**消さないこと**
 templates.html    メニュー表テンプレート一覧（検索の受け皿の中心。11デザインへの入口）
 menu-cafe.html    カフェのメニュー表の作り方
 menu-izakaya.html 居酒屋の品書き・ドリンクメニューの作り方
@@ -102,7 +103,46 @@ note-assets/      note記事の下書きとスクリーンショット（公開�
 - `llms.txt` に概要・できること・料金・リンクを記載
 - 構造化データ：`index.html` に `WebApplication`（無料と¥1,480の2つの `offers`）＋ `FAQPage`、
   `faq.html` に `FAQPage`
+- Search Console 登録済み（2026-09-17、`studio@`）。下の「Search Console」の節
 - GA4 稼働中（`G-4L5JYWWVGJ`。**ここに旧い誤記のIDを書いてしまっていた。2026-09-17 に実装側へ合わせた**）。課金ファネルのイベントは `PRO-PLAN.md` §4-3
+
+### Search Console（2026-09-17 登録）
+
+**プロパティ**：`https://menufits.kokokikaku.com/`（URLプレフィックス）
+**アカウント**：`studio@kokokikaku.com`
+**所有権の確認**：HTMLファイル `googleb736d92e1fe0566c.html`
+
+> **このファイルを消さないこと。** 消すと所有権が外れ、
+> プロパティごと失われる。
+
+同じアカウントにあるのは `kininarumono.jp` と `zenginpon.kokokikaku.com`。
+`misefits` と `pitch` は未登録。
+
+**登録時点の状態（2026-09-17）**
+
+- インデックス登録済み：**1ページ（トップのみ）**
+- 未登録：**15ページ**。理由はすべて「**検出 - インデックス未登録**」
+- `sitemap.xml` は robots.txt 経由で 2026-08-21 から認識されており、
+  最終読み込み 2026-09-13・ステータス「成功しました」
+
+つまり、**Google は URL を知っているがクロールを後回しにしている**。
+被リンクがほぼ無い新規サイトでは普通に起きる。技術的な不具合ではない。
+
+**やったこと**
+
+- `sitemap.xml` を再送信（articles.html 追加後の17URL）
+- 下の8ページを URL検査から**インデックス登録をリクエスト**した
+  （templates / guide / articles / menu-washoku / menu-izakaya / menu-cafe /
+  menu-chuka / faq）
+
+**次にやること**
+
+- 1〜2週後に「ページ」レポートを見て、登録済みが増えたか確かめる。
+  増えていなければ、問題はクロールではなく**サイトの評価（被リンク）**側
+- `misefits.kokokikaku.com` と `pitch.kokokikaku.com` から MenuFits へのリンクが**0件**。
+  `kokokikaku.com` からは8か所張られているので、片方向になっている
+- ヘッドの「メニュー表 テンプレート 無料」は Canva / Adobe Express / グラフィック /
+  デザインAC が占有している。当面取れない。長尾（業態×具体的な詰まり方）で拾う
 
 ### `guide.html`（2026-09-01 対応済み）
 
