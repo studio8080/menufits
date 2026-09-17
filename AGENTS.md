@@ -115,8 +115,33 @@ note-assets/      note記事の下書きとスクリーンショット（公開�
 > **このファイルを消さないこと。** 消すと所有権が外れ、
 > プロパティごと失われる。
 
-同じアカウントにあるのは `kininarumono.jp` と `zenginpon.kokokikaku.com`。
-`misefits` と `pitch` は未登録。
+**studio@ のプロパティ（2026-09-17 時点・4件）**
+
+| プロパティ | 登録済み | 未登録 |
+|---|---|---|
+| `menufits.kokokikaku.com` | 1 | 15（検出 - インデックス未登録） |
+| `misefits.kokokikaku.com` | 8 | 5 |
+| `pitch.kokokikaku.com` | 178 | 64 |
+| `kininarumono.jp` | — | — |
+| `zenginpon.kokokikaku.com` | — | — |
+
+`misefits` と `pitch` はもともと `mikan@` に登録されていたが、
+2026-09-17 に `studio@` でも所有権を確認した（同じ `googleb736d92e1fe0566c.html`）。
+
+> **検索パフォーマンスやインデックスの記録はサイトに紐づく。**
+> アカウントごとに別々に貯まるわけではなく、所有権の確認だけがアカウントごと。
+> だから `studio@` で確認した時点で過去16か月分がそのまま見える。
+> `mikan@` 側のプロパティを消しても `studio@` 側の数字は変わらない。
+
+**`mikan@` にはまだ同じプロパティが残っている。** 消すなら、
+`studio@` で数字が見えていることを確かめてから。先に消す理由は無い。
+**`kokokikaku.com` だけは `mikan@` のまま残す**（会社サイトは意図的に `mikan@` 運用）。
+
+**所有権確認ファイルの置き場所**（どれも消さないこと）
+
+- `menufits/googleb736d92e1fe0566c.html`
+- `Misefits/googleb736d92e1fe0566c.html`
+- `pitch-dict/googleb736d92e1fe0566c.html`
 
 **登録時点の状態（2026-09-17）**
 
