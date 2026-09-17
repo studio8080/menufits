@@ -26,7 +26,7 @@
 
 | 値 | 場所 |
 |---|---|
-| GA4 測定ID `G-4L5JYWNVGJ` | `analytics.js` と `index.html` のインラインローダー |
+| GA4 測定ID `G-4L5JYWWVGJ` | `analytics.js` と `index.html` のインラインローダー |
 | `PRO_PURCHASE_URL`（Stripe決済リンク） | `index.html` と `pro.html` |
 | デザイン数・書体数などの訴求数値 | `index.html`（meta / JSON-LD / LP / ヘルプ）、`pro.html`、`faq.html`、`templates.html`、`llms.txt`、note記事 |
 | 無料／Pro の切り分け（どの機能がどちら側か） | `index.html` の `FREE_*` 定数、`pro.html` の比較表、`templates.html` の無料/PROバッジ、業態別ページ本文 |
@@ -98,11 +98,11 @@ note-assets/      note記事の下書きとスクリーンショット（公開�
 
 ### いまの状態
 
-- `robots.txt` は全許可（AIクローラーも明示的に許可）。`sitemap.xml` に12ページ
+- `robots.txt` は全許可（AIクローラーも明示的に許可）。`sitemap.xml` に17URL（HTML 13 ページ＋サンプルPDF 4）
 - `llms.txt` に概要・できること・料金・リンクを記載
 - 構造化データ：`index.html` に `WebApplication`（無料と¥1,480の2つの `offers`）＋ `FAQPage`、
   `faq.html` に `FAQPage`
-- GA4 稼働中（`G-4L5JYWNVGJ`）。課金ファネルのイベントは `PRO-PLAN.md` §4-3
+- GA4 稼働中（`G-4L5JYWWVGJ`。**ここに旧い誤記のIDを書いてしまっていた。2026-09-17 に実装側へ合わせた**）。課金ファネルのイベントは `PRO-PLAN.md` §4-3
 
 ### `guide.html`（2026-09-01 対応済み）
 
