@@ -106,6 +106,10 @@ body.app-mode #lp{display:none}
 .lplogo{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:9px;
   background:#26231c;color:#f2ead8;font-family:Georgia,serif;font-size:19px}
 .lpkana{font-family:var(--f-gothic);font-size:11.5px;font-weight:500;color:#8b8578;letter-spacing:.14em;margin-top:4px}
+.lphnav{margin-left:auto;display:flex;align-items:center;gap:18px}
+.lphnav a{font-family:var(--f-gothic);font-size:12.5px;font-weight:600;letter-spacing:.08em;color:#6c675b;text-decoration:none;white-space:nowrap}
+.lphnav a:hover{color:#1c1912}
+@media(max-width:640px){.lphnav{gap:12px}.lphnav a{font-size:11.5px}.lphnav a.opt{display:none}}
 .lphero{padding:64px 0 54px;text-align:center}
 .lpeyebrow{font-family:var(--f-en-sans);font-size:clamp(10px,1.2vw,12px);font-weight:600;letter-spacing:.42em;color:#a3785a;margin-bottom:22px}
 .lphero h1{font-family:var(--f-mincho);font-size:clamp(30px,5vw,46px);font-weight:500;letter-spacing:.06em;line-height:1.5;margin:0 0 20px}
@@ -1155,6 +1159,11 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
 <div id="lp">
   <header class="lph">
     <div class="lpbrand"><span class="lplogo">M</span>MenuFits<span class="lpkana">メニューフィッツ</span></div>
+    <nav class="lphnav" aria-label="サイト内">
+      <a href="articles.html">読みもの</a>
+      <a class="opt" href="templates.html">テンプレート</a>
+      <a class="opt" href="pro.html">料金</a>
+    </nav>
   </header>
   <section class="lphero">
     <div class="lpeyebrow">FREE ・ NO SIGN-UP ・ A4 PDF</div>
@@ -1164,7 +1173,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
       <button class="lpbtn primary lpstart" data-sample="cafe">サンプルから始める</button>
       <button class="lpbtn lpstart" data-sample="blank">白紙から作る</button>
     </div>
-    <div class="lpnote">作成データはあなたのブラウザ内にだけ保存されます。サーバーには送信されません。</div>
+    <div class="lpnote">作成データはあなたのブラウザ内にだけ保存されます。サーバーには送信されません。<br>会員登録・ログインはありません。メニューを１枚つくって A4 の PDF にするまでも、<a href="articles.html">サイト内の記事</a>も、どなたでも条件なしでご利用いただけます。</div>
   </section>
   <section class="lpsec">
     <h2>３つの特徴</h2>
@@ -1226,9 +1235,10 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
     </div>
   </section>
   <section class="lpsec">
-    <h2>業態別のつくり方</h2>
-    <p class="lpsub">その業態でしかつまずかないところを、別ページにまとめてあります。</p>
+    <h2>読みもの</h2>
+    <p class="lpsub">その業態でしかつまずかないところを、記事にまとめてあります。どれも登録不要で全文読めます。</p>
     <div class="lplinks">
+      <a href="articles.html"><b>記事の一覧</b><span>メニュー表の作り方の記事を、新しい順に並べてあります</span></a>
       <a href="templates.html"><b>メニュー表テンプレート一覧</b><span>11種類のデザインを、業態から選ぶ</span></a>
       <a href="menu-cafe.html"><b>カフェのメニュー表</b><span>ドリンクの並べ方、ホットとアイス、サイズ違い</span></a>
       <a href="menu-izakaya.html"><b>居酒屋の品書き</b><span>品数が多いときの絞り方、飲み放題とお通し</span></a>
@@ -1254,6 +1264,7 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   <footer class="lpfoot">
     <div class="lprow">
       <a href="#" id="lpHelp">使い方</a><span>・</span>
+      <a href="articles.html">読みもの</a><span>・</span>
       <a href="templates.html">テンプレート</a><span>・</span>
       <a href="guide.html">使い方ガイド</a><span>・</span>
       <a href="pro.html">料金・Proガイド</a><span>・</span>

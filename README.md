@@ -16,6 +16,7 @@ https://menufits.kokokikaku.com/
 - `page.css` / `analytics.js` — 静的サブページの共通スタイルとGA4ローダー
 - `pro.html` — 料金・Proガイド（この1ページで購入まで完結させる）
 - `pro-unlock.html` — 決済後のリダイレクト先（ライセンスキーの表示・解放）
+- `articles.html` — 読みもの（記事一覧）。記事が無条件で読めることを明示するハブ
 - `faq.html` / `releases.html` — よくある質問・更新履歴
 - `privacy.html` / `tokushoho.html` — プライバシー・免責／特定商取引法に基づく表記
 - `CNAME` — カスタムドメイン設定（GitHub Pages）

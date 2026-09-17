@@ -277,3 +277,39 @@ td li{margin-bottom:3px;font-size:13.5px}
   .cta{padding:26px 20px;border-radius:14px}
   .adbox{margin-top:18px}
 }
+
+/* ---------- ヘッダーのサイト内ナビ ----------
+   もしもアフィリエイトの審査で「条件を満たさないと使えない機能があるメディア」と
+   判定されたため、記事（読みもの）へ無条件で辿り着けることを全ページの先頭で示す。
+   .opt を付けたリンクは狭い画面で隠す（「読みもの」だけは常に残す）。 */
+.ph .phnav{display:flex;align-items:center;gap:16px}
+.ph .phnav a{
+  font:600 12.5px/1 var(--f-gothic);letter-spacing:.08em;
+  text-decoration:none;color:var(--ink-soft);white-space:nowrap;
+}
+.ph .phnav a:hover{color:var(--dark)}
+@media(max-width:640px){
+  .ph .phnav{gap:12px}
+  .ph .phnav a{font-size:11.5px}
+  .ph .phnav a.opt{display:none}
+}
+
+/* ---------- 「条件なし」の断り書き ---------- */
+.openbar{
+  display:block;margin:0 0 18px;
+  background:rgba(28,25,18,.035);border:1px solid var(--line);border-radius:12px;
+  padding:13px 16px;font-size:12.5px;line-height:1.85;color:var(--ink-soft);letter-spacing:.04em;
+}
+.openbar b{color:var(--ink)}
+
+/* ---------- 記事一覧 ---------- */
+.arts{border-top:1px solid var(--line)}
+.arts a{
+  display:block;text-decoration:none;color:inherit;
+  border-bottom:1px solid var(--line);padding:20px 2px;
+  transition:background .3s var(--ease),padding .3s var(--ease);
+}
+.arts a:hover{background:rgba(28,25,18,.025);padding-left:10px;padding-right:10px}
+.arts .dt{font-family:var(--f-en);font-size:11.5px;font-weight:600;letter-spacing:.16em;color:var(--brown)}
+.arts .ti{display:block;font-family:var(--f-mincho);font-size:17px;font-weight:600;letter-spacing:.1em;line-height:1.6;margin:5px 0 7px;color:var(--dark)}
+.arts .ds{display:block;font-size:13px;line-height:1.9;color:var(--mut)}

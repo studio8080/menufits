@@ -2,62 +2,67 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://menufits.kokokikaku.com/</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
+    <loc>https://menufits.kokokikaku.com/articles.html</loc>
+    <lastmod>2026-09-17</lastmod>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://menufits.kokokikaku.com/guide.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/templates.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/menu-cafe.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/menu-izakaya.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/menu-washoku.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/menu-chuka.html</loc>
-    <lastmod>2026-09-04</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/pro.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/faq.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/releases.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>monthly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/privacy.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>yearly</changefreq>
   </url>
   <url>
     <loc>https://menufits.kokokikaku.com/tokushoho.html</loc>
-    <lastmod>2026-09-01</lastmod>
+    <lastmod>2026-09-17</lastmod>
     <changefreq>yearly</changefreq>
   </url>
   <url>
