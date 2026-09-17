@@ -218,6 +218,15 @@ td li{margin-bottom:3px;font-size:13.5px}
 .ad-note a{color:var(--mut);text-underline-offset:3px;margin-left:.5em}
 .ad-note a:hover{color:var(--ink)}
 
+/* 本文の途中に置くとき。カードとカードの間に入るので上下に余白を取る */
+.adbox.inline{margin:20px auto}
+/* 広告の前に置く、こちら側の文章。
+   これは広告ではないのでカードの外に出し、
+   その下の「広告」ラベルから先が広告だと分かるようにする。 */
+.adbox .ad-lead{
+  margin:0 0 12px;font-size:13px;line-height:1.9;letter-spacing:.04em;color:var(--mut);
+}
+
 /* テキスト広告。バナーだと紙面の落ち着きを壊すため、文字リンクで出している */
 .adbox .ad-slot a{font-size:14px;font-weight:700;letter-spacing:.06em;text-underline-offset:4px}
 
