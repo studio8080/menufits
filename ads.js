@@ -35,6 +35,17 @@
      http に降格すると CSP で弾かれ、画像が黙って消える。
    ============================================================ */
 (function () {
+  /* ■ 掲載スイッチ（いまは OFF）
+     false にすると、全ページの広告枠と冒頭の断り書きが DOM ごと消える。
+     画像リクエストも飛ばないので、インプレッションも立たない。
+
+     2026-09-17、もしもアフィリエイトで MenuFits のメディア登録が削除されたため
+     OFF にした。登録がない間はクリックが計測されないだけでなく、
+     未登録メディアでの掲載としてガイドライン違反に問われうる。
+
+     復活の連絡が来てから true に戻すこと。戻すときは、各ページの
+     template の中身がその記事の内容に合っているかも見直す。 */
+  var ENABLED = false;
   var boxes = document.querySelectorAll('[data-ad]');
   var notes = document.querySelectorAll('[data-ad-note]');
   if (!boxes.length && !notes.length) return;
@@ -45,6 +56,9 @@
     }
   }
   function dropAll() { remove(boxes); remove(notes); }
+
+  // 0. 掲載を止めている間
+  if (!ENABLED) return dropAll();
 
   // 1. Pro購入者には出さない
   try {
