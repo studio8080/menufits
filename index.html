@@ -2269,8 +2269,11 @@ addEventListener('resize',fit);
 
 /* ---------------- inline editing ---------------- */
 const stage=$('#stage');
+let menuEditStarted=false;
 stage.addEventListener('input',e=>{
   const t=e.target.closest('[data-path]'); if(!t) return;
+  // 入力内容や店名は送らず、初回の紙面編集だけをページ内で1回記録する。
+  if(!menuEditStarted){ menuEditStarted=true; trackEvent('menu_edit_start'); }
   const v=sanitizeHTML(t.innerHTML);
   set(t.dataset.path,v);
   $$('[data-path="'+t.dataset.path+'"]').forEach(n=>{ if(n!==t) n.innerHTML=v; });
@@ -3094,7 +3097,12 @@ $('#printBtn').onclick=()=>{
       <button class="btn primary" id="doPrint">印刷画面をひらく</button>
       <button class="btn" id="mClose">とじる</button>
     </div>`);
-  $('#doPrint').onclick=()=>{ mask.classList.remove('on'); setTimeout(()=>window.print(),160); };
+  $('#doPrint').onclick=()=>{
+    mask.classList.remove('on');
+    // 保存完了ではなく、印刷ダイアログを開く要求として計測する。
+    trackEvent('menu_print_request');
+    setTimeout(()=>window.print(),160);
+  };
 };
 
 $('#helpBtn').onclick=()=>{
