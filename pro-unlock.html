@@ -137,6 +137,7 @@ var DEVICE_KEY_STORE  = 'menufitsDeviceId';
 var $ = function (id) { return document.getElementById(id); };
 var sessionId = new URLSearchParams(location.search).get('session_id') || '';
 var licenseKey = '';
+var purchaseTracked = false;
 
 function deviceId() {
   try {
@@ -156,20 +157,22 @@ function showReady(key) {
   $('failed').hidden = true;
   $('ready').hidden = false;
 
-  // 購入イベントはリロードでの二重計上を防ぐ
+  // 保存できない環境でもページ内の重複を防ぎ、計測ラッパーは呼び出す。
+  if (!sessionId || purchaseTracked || typeof window.trackEvent !== 'function') return;
+  var mark = 'menufitsPurchaseTracked:' + sessionId;
   try {
-    var mark = 'menufitsPurchaseTracked:' + sessionId;
-    if (sessionId && localStorage.getItem(mark) !== '1') {
-      localStorage.setItem(mark, '1');
-      if (window.trackEvent) {
-        window.trackEvent('purchase', {
-          transaction_id: sessionId,
-          value: 1480,
-          currency: 'JPY',
-          items: [{ item_id: 'menufits_pro', item_name: 'MenuFits Pro', price: 1480, quantity: 1 }]
-        });
-      }
-    }
+    if (localStorage.getItem(mark) === '1') return;
+  } catch (e) {}
+  try {
+    window.trackEvent('purchase', {
+      transaction_id: sessionId,
+      value: 1480,
+      currency: 'JPY',
+      items: [{ item_id: 'menufits_pro', item_name: 'MenuFits Pro', price: 1480, quantity: 1 }]
+    });
+    purchaseTracked = true;
+    // ストレージが使える場合はリロード時の二重計上も防ぐ。
+    try { localStorage.setItem(mark, '1'); } catch (e) {}
   } catch (e) {}
 }
 
