@@ -117,7 +117,7 @@ en/terms.html     英語の利用規約・返金ポリシー（14日以内は全
 en/privacy.html   英語のプライバシーポリシー（解析のオプトアウトUI付き）
 en/pro-unlock.html  英語版（US$19・Managed Payments）の購入完了ページ。処理は pro-unlock.html と同じ。**両方そろえる**
 INTERNATIONAL-PLAN.md  海外展開の判断（決済・地域・価格・工程）
-tests/            node --test tests/*.test.cjs（購入計測・ファネル計測・英語UI）
+tests/            node --test tests/*.test.cjs（購入計測・ファネル計測・英語UI・解析に送る値・CSP）
 templates.html    メニュー表テンプレート一覧（検索の受け皿の中心。11デザインへの入口）
 menu-cafe.html    カフェのメニュー表の作り方
 menu-izakaya.html 居酒屋の品書き・ドリンクメニューの作り方
@@ -146,7 +146,7 @@ note-assets/      note記事の下書きとスクリーンショット（公開�
 - Functions の CORS は `menufits.kokokikaku.com` 固定。他オリジンはブラウザ側で弾かれる
 - Webhook は Stripe の署名検証を通過したリクエストしか処理しない
 - カード情報は Stripe が直接受け取り、当方は一切受け取らない
-- 静的サブページ（12枚）には CSP を設定済み
+- 静的サブページにも**アプリ本体（`index.html`）にも** CSP を設定済み（本体は 2026-09-25）
 
 ### 気をつけるところ
 
@@ -159,10 +159,19 @@ note-assets/      note記事の下書きとスクリーンショット（公開�
   紙面の文字を innerHTML で描く箇所は必ずこれを通す。新しい描画箇所を足すときも同じ
 - **ライセンス判定はクライアント側だけ。** 回避は完全には防げない前提の設計。
   DRM的な作り込みはしない（判断の経緯は `PRO-PLAN.md`）
-- **`index.html` に CSP が無い。** サブページには入れたが本体は未設定。入れる場合は
-  Google Fonts・インラインscript/style・`data:`/`blob:` 画像・cloudfunctions への
-  `connect-src` を通す必要がある。**入れたら必ず全機能を通しで確認すること**（PDF出力・
-  写真アップロード・ライセンス解放）
+- **`index.html` の CSP（2026-09-25）。** 外部とのやり取りを Google Fonts・GA4・ライセンス検証の関数
+  （`FUNCTIONS_BASE`）だけに絞っている。JS も CSS もインラインなので `'unsafe-inline'` は外せない
+  （効くのは「知らない場所からスクリプトを読まない／知らない場所へデータを送らない」の部分）。
+  **読み込み先や通信先を足したら、`index.html` 冒頭の CSP にも足すこと。** 直し忘れると本番で黙って壊れる
+  （書体が代替になる・ライセンス解放が通らない・計測が止まる）。`tests/csp.test.cjs` がある程度は検出する。
+  入れたときの確認手順（CSP を変えたら同じことをする）：
+  1. 前後で PDF を作って比べる（AGENTS.md「サンプルPDF」の手順。サイズと埋め込み書体が一致すること。
+     書体は `pypdf` でページの `/Font` から読む——生のバイト列を grep すると圧縮ストリームで見落とす）
+  2. 39ファミリーを `document.fonts.load()` で全部読み込ませ、失敗が0件
+  3. 写真の入力欄（`logoInput` / `heroInput` など）に `DataTransfer` で画像を渡し、紙面に出る
+  4. ライセンス解放：ローカルからは CORS で弾かれるのが正常。**「Refused to connect … Content Security Policy」
+     が出たら CSP の漏れ**、CORS のエラーなら関数まで届いている
+  5. `?lang=en` でも同じ。`securitypolicyviolation` イベントとコンソールに違反が0件
 
 ## SEO / LLMO
 

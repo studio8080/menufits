@@ -3,6 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<!-- CSP（2026-09-25）。外部とのやり取りは Google Fonts・GA4・ライセンス検証の関数だけに絞る。
+     本体は JS も CSS もインラインなので 'unsafe-inline' は外せない。効くのは「知らない場所から
+     スクリプトを読まない／知らない場所へデータを送らない」の部分。
+     写真は FileReader → data: で持つ。Stripe・X・LINE への移動はページ遷移なので対象外。
+     **読み込み先を足したら、ここにも足すこと。** 足したら PDF 出力・写真・ライセンス解放を通しで確認する -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://us-central1-misefits.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
+<meta name="referrer" content="strict-origin-when-cross-origin">
 <title>MenuFits（メニューフィッツ）｜飲食店メニューを、ひらいて、打ちかえて、PDF。</title>
 <meta name="description" content="登録不要。無料で1枚のメニューが作れる、飲食店向けのメニュー作成ツール。ブラウザだけで縦書き・写真メニュー・文字装飾に対応し、A4のPDFとして出力できます。データは端末内にのみ保存されます。">
 <meta property="og:title" content="MenuFits（メニューフィッツ）">
