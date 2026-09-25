@@ -52,6 +52,27 @@
 （`/en/` が全部404、`?lang=en` も日本語のまま）。
 **関数を先にデプロイしたら、フロントを push するまでは決済リンクを外に出さないこと。**
 
+**通し確認（2026-09-25・本番でのテスト購入と返金）**
+
+日本語版（¥1,480）と英語版（US$19）を実際に購入し、全額返金して確かめた。
+**すべて通過。**
+
+| 確認項目 | 日本語版 | 英語版 |
+|---|---|---|
+| 購入完了ページのキー表示 | ✓ | ✓（`/en/pro-unlock.html`・全文英語） |
+| webhook | ✓ 200 `"ok"` 14:48:33 | ✓ 200 `"ok"` 14:49:09 |
+| 控えメール | ✓ 14:48:30「ライセンスキーのご案内」 | ✓ 14:49:07「Your MenuFits Pro license key」 |
+| `menufitsVerifyLicense` | ✓ `{"valid":true}` | ✓ `{"valid":true}` |
+| `charge.refunded` | ✓ 200 `"ok (refund recorded)"` 14:54:29 | ✓ 200 `"ok (refund recorded)"` 14:54:24 |
+| 返金後の検証 | ✓ `{"valid":false,"reason":"revoked"}` | ✓ 同じ |
+
+- **9/1 から失敗していた控えメールが直った**（`SMTP_PASS` v6）。
+  Price ID による言語の切り替えも機能している
+- 購入完了ページには失敗時用の「キーを取得できませんでした」が**非表示のまま DOM に残る**。
+  調べるときは `textContent` だけでなく可視状態も見ること
+- `menufitsVerifyLicense` は `device` を付けなければ端末を登録しない。
+  **5台の枠を消費せずにキーの生死を確かめられる**
+
 **Stripe の webhook 購読イベント（2026-09-25 確認済み）**
 
 送信先「MenuFits Pro license issuer」（`we_1UAonw3C6tqke0fyWyolaZ15`、
