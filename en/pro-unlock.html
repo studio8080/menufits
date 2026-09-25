@@ -11,7 +11,7 @@
 <meta name="theme-color" content="#26231c">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2326231c'/%3E%3Ctext x='32' y='44' font-size='36' font-family='Georgia,serif' fill='%23f2ead8' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
 <link rel="apple-touch-icon" href="/icon-512.png">
-<link rel="manifest" href="/manifest.webmanifest">
+<link rel="manifest" href="/en/manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
@@ -134,6 +134,20 @@ var DEVICE_KEY_STORE  = 'menufitsDeviceId';
 
 var $ = function (id) { return document.getElementById(id); };
 var sessionId = new URLSearchParams(location.search).get('session_id') || '';
+// session_id は購入から30日間、それだけでライセンスキーを取り出せる。解析には生のまま送らない。
+// GA の重複排除に使えればよいので、戻せない短い値にする（FNV-1a を2系統つないだ64bit）。
+// GA の取引と Stripe の注文を突き合わせるときは、session_id に同じ計算をかける。
+// **pro-unlock.html と en/pro-unlock.html で同じ実装にそろえること。**
+function txId(s) {
+  var a = 0x811c9dc5, b = 0x050c5d1f;
+  for (var i = 0; i < s.length; i++) {
+    var c = s.charCodeAt(i);
+    a = Math.imul(a ^ c, 0x01000193) >>> 0;
+    b = Math.imul(b ^ c, 0x5bd1e995) >>> 0;
+  }
+  return 'mf_' + ('0000000' + a.toString(16)).slice(-8) + ('0000000' + b.toString(16)).slice(-8);
+}
+
 var licenseKey = '';
 var purchaseTracked = false;
 
@@ -163,7 +177,7 @@ function showReady(key) {
   } catch (e) {}
   try {
     window.trackEvent('purchase', {
-      transaction_id: sessionId,
+      transaction_id: txId(sessionId),
       value: 19,
       currency: 'USD',
       items: [{ item_id: 'menufits_pro_en', item_name: 'MenuFits Pro (US$)', price: 19, quantity: 1 }]

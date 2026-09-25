@@ -44,7 +44,18 @@
   var uiLang = 'ja';
   try { if (document.documentElement.lang === 'en') uiLang = 'en'; } catch (e) {}
   window.gtag('set', 'user_properties', { ui_lang: uiLang });
-  window.gtag('config', GA_ID, { anonymize_ip: true });
+  // 購入完了ページの URL にある session_id は、それだけで購入から30日間ライセンスキーを
+  // 取り出せる。gtag は既定で URL をそのまま page_location に送るので、値を伏せて渡す。
+  // **index.html のインライン版にも同じ処理がある。片方だけ直さないこと。**
+  var config = { anonymize_ip: true };
+  try {
+    var u = new URL(location.href);
+    if (u.searchParams.has('session_id')) {
+      u.searchParams.set('session_id', 'redacted');
+      config.page_location = u.toString();
+    }
+  } catch (e) {}
+  window.gtag('config', GA_ID, config);
 
   var s = document.createElement('script');
   s.async = true;

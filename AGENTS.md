@@ -36,6 +36,9 @@
 | 英語の文言 | `index.html` の `T('日本語','English')` と HTML の `data-en*` 属性。**日本語を直したら英語も直す** |
 | 英語版の価格 US$19（MiseFits と同額） | `index.html`（`PRO_PRICE`・サイドバーの `data-en-html`）、`en/index.html`、`en/pro-unlock.html`（計測の金額）、`llms.txt` |
 | 解析の同意モード（EEA・英国・スイスは既定で拒否）の国リスト | `analytics.js` と `index.html` のインラインローダー |
+| GA に送る URL から `session_id` を伏せる処理 | `analytics.js` と `index.html` のインラインローダー |
+| `transaction_id` を `session_id` から作る `txId()` | `pro-unlock.html` と `en/pro-unlock.html`（テストで同一性を確認している） |
+| manifest（名前・起動先・アイコン） | `manifest.webmanifest`（日本語）と `en/manifest.webmanifest`（英語）。英語UIでは `index.html` が英語版に差し替える |
 
 ### 英語UI（2026-09-25）
 
@@ -44,6 +47,11 @@
 - **英語UIの購入先は `PRO_PURCHASE_URL_EN`（USD・Stripe Managed Payments）。空のあいだは「準備中」。
   円のリンク（`PRO_PURCHASE_URL`）へは絶対に流さない**（海外の消費者に円で売ると各国の税の義務がこちらに残る）
 - 英語の静的ページは `en/` 配下。広告は出さない。`hreflang` はトップの ja ↔ en の組だけ
+- ホーム画面に追加したときの名前・起動先も英語にする（`en/manifest.webmanifest`、起動先 `/?lang=en`）。
+  日本語の manifest のままだと、英語で使っていた人が日本語LPで起動してしまう
+- **購入完了ページの `session_id` は、それだけで購入から30日間キーを取り出せる鍵。** 解析には生のまま送らない。
+  `page_location` は `session_id=redacted` に伏せ、`transaction_id` は `txId()`（戻せない64bitの値）にしている。
+  GA の取引と Stripe の注文を突き合わせるときは、`session_id` に同じ `txId()` をかける
 
 **公開状況（2026-09-25）**
 
@@ -103,6 +111,8 @@ ads.js            記事中の広告枠（アフィリエイト）。先頭の E
 articles.html     読みもの（記事一覧）。登録なしで読めることを明示するハブ
 googleb736d92e1fe0566c.html  Search Console の所有権確認ファイル。**消さないこと**
 en/index.html     英語のLP（海外の日本食レストラン向け）。アプリは ../?lang=en
+en/manifest.webmanifest  英語の manifest（名前・起動先 /?lang=en）。日本語は manifest.webmanifest
+icon-192.png      manifest 用の192pxアイコン（icon-512.png を縮小）
 en/terms.html     英語の利用規約・返金ポリシー（14日以内は全額・EU/英国/スイス/UAE はまだ売らない・運営者の住所）。MiseFits の en/terms.html と同じ条件
 en/privacy.html   英語のプライバシーポリシー（解析のオプトアウトUI付き）
 en/pro-unlock.html  英語版（US$19・Managed Payments）の購入完了ページ。処理は pro-unlock.html と同じ。**両方そろえる**

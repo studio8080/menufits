@@ -37,7 +37,9 @@ for (const failure of [undefined, 'get', 'set']) {
     assert.equal(p.calls.length, 1);
     const [event, payload] = p.calls[0];
     assert.equal(event, 'purchase');
-    assert.equal(payload.transaction_id, 'cs_test_fixture');
+    // session_id はそれだけでキーを取り出せるので、GA には戻せない値で送る
+    assert.match(payload.transaction_id, /^mf_[0-9a-f]{16}$/);
+    assert.ok(!payload.transaction_id.includes('cs_test_fixture'));
     assert.equal(payload.value, 1480);
     assert.equal(payload.currency, 'JPY');
     assert.equal(payload.items[0].item_id, 'menufits_pro');

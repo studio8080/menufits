@@ -54,7 +54,11 @@
   }catch(e){}
   window.MENUFITS_LANG=lang;
   window.T=function(ja,en){ return lang==='en' ? en : ja; };
-  if(lang==='en'){ try{ document.documentElement.lang='en'; }catch(e){} }
+  if(lang==='en'){ try{
+    document.documentElement.lang='en';
+    // ホーム画面に追加したときの名前と起動先を英語にする（日本語の manifest だと日本語LPで起動する）
+    var mf=document.querySelector('link[rel="manifest"]'); if(mf) mf.setAttribute('href','/en/manifest.webmanifest');
+  }catch(e){} }
 })();
 
 (function(){
@@ -84,7 +88,10 @@
       'LU','MT','NL','PL','PT','RO','SK','SI','ES','SE','IS','LI','NO','GB','CH']});
   window.gtag('js', new Date());
   window.gtag('set','user_properties',{ui_lang: window.MENUFITS_LANG==='en' ? 'en' : 'ja'});
-  window.gtag('config', GA_ID, {anonymize_ip:true});
+  // session_id は購入から30日間キーを取り出せる鍵。解析には伏せて送る（analytics.js と同じ処理）
+  var gaConfig={anonymize_ip:true};
+  try{ var gu=new URL(location.href); if(gu.searchParams.has('session_id')){ gu.searchParams.set('session_id','redacted'); gaConfig.page_location=gu.toString(); } }catch(e){}
+  window.gtag('config', GA_ID, gaConfig);
 
   var s=document.createElement('script');
   s.async=true;
@@ -1650,7 +1657,9 @@ const FONT_LABEL_EN={
 };
 (function applyStaticLang(){
   const sw=$('[data-lang-switch]');
-  if(sw){ sw.hidden=false; sw.href=EN?'./?lang=ja':'./?lang=en'; sw.textContent=EN?'日本語':'English'; }
+  // 切替先の言語で読み上げさせる（英語UIの「日本語」を英語発音で読まれないように）
+  if(sw){ sw.hidden=false; sw.href=EN?'./?lang=ja':'./?lang=en'; sw.textContent=EN?'日本語':'English';
+    sw.lang=EN?'ja':'en'; sw.hreflang=EN?'ja':'en'; }
   if(!EN) return;
   document.title='MenuFits — Japanese & bilingual menu maker';
   $$('[data-en]').forEach(e=>{ e.textContent=e.dataset.en; });
