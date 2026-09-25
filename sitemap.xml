@@ -85,4 +85,19 @@
     <lastmod>2026-09-04</lastmod>
     <changefreq>yearly</changefreq>
   </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/en/</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>monthly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/en/terms.html</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
+  <url>
+    <loc>https://menufits.kokokikaku.com/en/privacy.html</loc>
+    <lastmod>2026-09-25</lastmod>
+    <changefreq>yearly</changefreq>
+  </url>
 </urlset>

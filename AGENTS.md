@@ -12,6 +12,8 @@
 - 実体は **単一の `index.html`**（バニラJS・ビルド工程なし）。LP とエディタが同一ページ
 - 外部依存は Google Fonts（39ファミリー）のみ。**オンライン前提**
 - 2026-09-01 から買い切りの「MenuFits Pro」（¥1,480税込）を販売中
+- 2026-09-25 から**英語UI**を追加（`?lang=en`、入口は `/en/`）。海外の日本食レストラン向け。
+  決済・地域・価格の判断は `INTERNATIONAL-PLAN.md`
 
 ## いちばん大事なルール
 
@@ -31,6 +33,17 @@
 | デザイン数・書体数などの訴求数値 | `index.html`（meta / JSON-LD / LP / ヘルプ）、`pro.html`、`faq.html`、`templates.html`、`llms.txt`、note記事 |
 | 無料／Pro の切り分け（どの機能がどちら側か） | `index.html` の `FREE_*` 定数、`pro.html` の比較表、`templates.html` の無料/PROバッジ、業態別ページ本文 |
 | フッターのリンク列 | 静的サブページ11枚と `index.html` のLPフッター |
+| 英語の文言 | `index.html` の `T('日本語','English')` と HTML の `data-en*` 属性。**日本語を直したら英語も直す** |
+| 英語版の価格 US$19（MiseFits と同額） | `index.html`（`PRO_PRICE`・サイドバーの `data-en-html`）、`en/index.html`、`en/pro-unlock.html`（計測の金額）、`llms.txt` |
+| 解析の同意モード（EEA・英国・スイスは既定で拒否）の国リスト | `analytics.js` と `index.html` のインラインローダー |
+
+### 英語UI（2026-09-25）
+
+- 表示言語は `?lang=en|ja` → `localStorage` の `menufitsLang` → 日本語。ブラウザの言語設定では切り替えない
+- 英語のときは日本語LPを出さずにエディタを開く。サンプルは同じキーで英語版（`SAMPLES_EN`）
+- **英語UIの購入先は `PRO_PURCHASE_URL_EN`（USD・Stripe Managed Payments）。空のあいだは「準備中」。
+  円のリンク（`PRO_PURCHASE_URL`）へは絶対に流さない**（海外の消費者に円で売ると各国の税の義務がこちらに残る）
+- 英語の静的ページは `en/` 配下。広告は出さない。`hreflang` はトップの ja ↔ en の組だけ
 
 ### 販売開始スイッチ `PRO_LAUNCHED`
 
@@ -49,6 +62,12 @@ analytics.js      GA4ローダーと trackEvent() ラッパー
 ads.js            記事中の広告枠（アフィリエイト）。先頭の ENABLED で全ページ一括で止められる
 articles.html     読みもの（記事一覧）。登録なしで読めることを明示するハブ
 googleb736d92e1fe0566c.html  Search Console の所有権確認ファイル。**消さないこと**
+en/index.html     英語のLP（海外の日本食レストラン向け）。アプリは ../?lang=en
+en/terms.html     英語の利用規約・返金ポリシー（14日以内は全額・EU/英国/スイス/UAE はまだ売らない・運営者の住所）。MiseFits の en/terms.html と同じ条件
+en/privacy.html   英語のプライバシーポリシー（解析のオプトアウトUI付き）
+en/pro-unlock.html  英語版（US$19・Managed Payments）の購入完了ページ。処理は pro-unlock.html と同じ。**両方そろえる**
+INTERNATIONAL-PLAN.md  海外展開の判断（決済・地域・価格・工程）
+tests/            node --test tests/*.test.cjs（購入計測・ファネル計測・英語UI）
 templates.html    メニュー表テンプレート一覧（検索の受け皿の中心。11デザインへの入口）
 menu-cafe.html    カフェのメニュー表の作り方
 menu-izakaya.html 居酒屋の品書き・ドリンクメニューの作り方
@@ -509,6 +528,8 @@ A4 の PDF にするところまで無料だが、それがトップページか
 - `templates.html` のカードを押すと、そのデザインでアプリが開く
   （PROのカードは無料デザインで開いたうえで購入モーダルが出る）
 - 広告コードを貼ったときは、**Pro解放済みのブラウザで枠が消える**こと
+- `?lang=en` で英語UI：LPを経ずにエディタが開く、サンプル4種が英語、Pro モーダルが US$19、
+  購入ボタンは `PRO_PURCHASE_URL_EN` が空なら「準備中」のトーストで止まる。`?lang=ja` で元に戻る
 
 ローカル確認はサブページが相対パスで `page.css` を読むため、簡易サーバーが必要。
 

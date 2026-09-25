@@ -33,7 +33,17 @@
 
   window.dataLayer = window.dataLayer || [];
   window.gtag = function () { window.dataLayer.push(arguments); };
+  // EEA・英国・スイスは解析Cookieを既定で拒否（同意バナーは未設置）。
+  // 地域は Google がIPで判定する。日本からのアクセスの計測は変わらない。
+  window.gtag('consent', 'default', { analytics_storage: 'denied', ad_storage: 'denied',
+    ad_user_data: 'denied', ad_personalization: 'denied',
+    region: ['AT', 'BE', 'BG', 'HR', 'CY', 'CZ', 'DK', 'EE', 'FI', 'FR', 'DE', 'GR', 'HU', 'IE', 'IT', 'LV', 'LT',
+      'LU', 'MT', 'NL', 'PL', 'PT', 'RO', 'SK', 'SI', 'ES', 'SE', 'IS', 'LI', 'NO', 'GB', 'CH'] });
   window.gtag('js', new Date());
+  // 表示言語。/en/ 配下は <html lang="en">、それ以外は日本語
+  var uiLang = 'ja';
+  try { if (document.documentElement.lang === 'en') uiLang = 'en'; } catch (e) {}
+  window.gtag('set', 'user_properties', { ui_lang: uiLang });
   window.gtag('config', GA_ID, { anonymize_ip: true });
 
   var s = document.createElement('script');

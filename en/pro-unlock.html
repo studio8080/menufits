@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ご購入ありがとうございます | MenuFits Pro</title>
-<meta name="description" content="MenuFits Pro のご購入完了ページ。ライセンスキーの表示と、この端末での解放を行います。">
+<title>Thank you for your purchase | MenuFits Pro</title>
+<meta name="description" content="MenuFits Pro purchase complete. Shows your license key and unlocks Pro on this device.">
 <meta name="robots" content="noindex,nofollow">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://us-central1-misefits.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -15,8 +15,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;500;600&family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="page.css">
-<script src="analytics.js"></script>
+<link rel="stylesheet" href="../page.css">
+<script src="../analytics.js"></script>
 <style>
   .keybox{text-align:center;padding:10px 0 4px}
   .keyval{
@@ -31,79 +31,74 @@
   @keyframes sp{to{transform:rotate(360deg)}}
   .acts{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:6px}
   .err{color:#8a3b17}
+  h1,h2,h3{letter-spacing:.005em}
 </style>
 </head>
 <body>
 
 <header class="ph">
-  <a class="brand" href="./" aria-label="MenuFits トップへ">
+  <a class="brand" href="./" aria-label="MenuFits home">
     <span class="logo">M</span>
-    <span>
-      <span class="nm">MenuFits</span>
-      <span class="kana">メニューフィッツ</span>
-    </span>
+    <span><span class="nm">MenuFits</span></span>
   </a>
   <span class="sp"></span>
-  <nav class="phnav" aria-label="サイト内">
-    <a href="articles.html">読みもの</a>
-    <a class="opt" href="templates.html">テンプレート</a>
-    <a class="opt" href="pro.html">料金</a>
+  <nav class="phnav" aria-label="Site">
+    <a class="opt" href="./#how">How it works</a>
+    <a class="opt" href="./#faq">FAQ</a>
   </nav>
-  <a class="btn mini" href="./">アプリを開く</a>
+  <a class="btn mini" href="../?lang=en">Open editor</a>
 </header>
 
 <main>
   <div class="head" style="text-align:center">
-    <h1>ご購入ありがとうございます</h1>
-    <p>MenuFits Pro のライセンスキーをお届けします。<br>
-      同じキーを、ご入力いただいたメールアドレス宛にもお送りしています。</p>
+    <h1>Thank you for your purchase</h1>
+    <p>Here is your MenuFits Pro license key.<br>
+      We have also emailed the same key to the address you entered at checkout.</p>
   </div>
 
   <section class="card">
     <div class="keybox">
-      <h2 style="margin-bottom:14px">ライセンスキー</h2>
+      <h2 style="margin-bottom:14px">License key</h2>
 
       <div id="pending">
-        <p class="waiting"><span class="spin"></span>キーを発行しています。数秒お待ちください…</p>
+        <p class="waiting"><span class="spin"></span>Issuing your key. This takes a few seconds…</p>
       </div>
 
       <div id="ready" hidden>
         <div class="keyval" id="keyval">—</div>
         <div class="acts">
-          <button class="btn primary" id="unlockBtn" type="button">この端末で解放して MenuFits を開く</button>
-          <button class="btn" id="copyBtn" type="button">キーをコピー</button>
+          <button class="btn primary" id="unlockBtn" type="button">Unlock on this device and open MenuFits</button>
+          <button class="btn" id="copyBtn" type="button">Copy key</button>
         </div>
         <p id="unlockMsg" style="margin-top:16px;font-size:13px;color:var(--mut)"></p>
       </div>
 
       <div id="failed" hidden>
-        <p class="err"><b>キーを取得できませんでした。</b></p>
+        <p class="err"><b>We could not fetch your key.</b></p>
         <p style="font-size:13.5px">
-          決済は完了している可能性があります。<b>このページを閉じずに</b>、
-          しばらく待ってから下のボタンで再試行してください。<br>
-          解決しない場合は、購入時のメールアドレスを添えて
-          <a href="https://kokokikaku.com/" target="_blank" rel="noopener">お問い合わせ</a>ください。
-          こちらで確認のうえ、キーをお送りします。
+          Your payment has probably gone through. <b>Keep this page open</b>,
+          wait a moment and try again with the button below.<br>
+          If it still fails, email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a>
+          with the email address you used at checkout, and we will send your key.
         </p>
-        <div class="acts"><button class="btn" id="retryBtn" type="button">もう一度試す</button></div>
+        <div class="acts"><button class="btn" id="retryBtn" type="button">Try again</button></div>
       </div>
 
       <div id="expired" hidden>
-        <p><b>このページでキーを表示できる期間（購入から30日）を過ぎました。</b></p>
-        <p style="font-size:13.5px">キーは購入時にメールでお送りしています。見つからない場合は、購入時のメールアドレスを添えて
-          <a href="https://kokokikaku.com/" target="_blank" rel="noopener">お問い合わせ</a>ください。</p>
+        <p><b>This page only shows your key for 30 days after purchase.</b></p>
+        <p style="font-size:13.5px">We emailed your key when you bought Pro. If you can’t find it,
+          email <a href="mailto:studio@kokokikaku.com">studio@kokokikaku.com</a> from the address you used at checkout.</p>
       </div>
     </div>
   </section>
 
   <section class="card">
-    <h2>このページのURLを控えておいてください</h2>
-    <p>購入から30日間は、このページを開けば同じキーを再表示できます。
-      それ以降はメールでお送りした控えをご覧ください（大切に保管をおすすめします）。</p>
+    <h2>Keep your key</h2>
+    <p>For 30 days after purchase, opening this page shows the same key again. After that, use the copy we emailed you.</p>
     <div class="note plain">
-      <b>解放のしかた（手で入力する場合）</b><br>
-      MenuFits を開く → 左パネルを下にスクロールして「MenuFits Pro」欄へ → 上のキーを貼り付けて「解放する」。<br>
-      同じキーで最大5台（ブラウザ単位）まで解放できます。
+      <b>To unlock by hand</b><br>
+      Open MenuFits → scroll the left panel down to “MenuFits Pro” → paste the key and press “Unlock”.<br>
+      One key unlocks up to 5 devices (counted per browser).
     </div>
   </section>
 </main>
@@ -112,22 +107,19 @@
   <div class="pf-in">
     <b>MenuFits</b>
     <span class="sp"></span>
-    <a href="./">アプリ</a>
-    <a href="articles.html">読みもの</a>
-    <a href="templates.html">テンプレート</a>
-    <a href="guide.html">使い方</a>
-    <a href="pro.html">料金・Proガイド</a>
-    <a href="faq.html">よくある質問</a>
-    <a href="privacy.html">プライバシー・免責</a>
-    <a href="tokushoho.html">特定商取引法に基づく表記</a>
-    <a href="https://kokokikaku.com/" target="_blank" rel="noopener">運営：ここ企画</a>
+    <a href="../?lang=en">Editor</a>
+    <a href="./">About</a>
+    <a href="terms.html">Terms &amp; refunds</a>
+    <a href="privacy.html">Privacy</a>
+    <a href="https://kokokikaku.com/" target="_blank" rel="noopener">Operated by Koko Kikaku (Japan)</a>
   </div>
 </footer>
 
 <script>
 /* ------------------------------------------------------------------
-   Stripe の Payment Link のリダイレクト先。
-   pro-unlock.html?session_id={CHECKOUT_SESSION_ID} で呼ばれる。
+   Stripe の Payment Link のリダイレクト先（英語版・US$19・Managed Payments）。
+   en/pro-unlock.html?session_id={CHECKOUT_SESSION_ID} で呼ばれる。
+   **処理は ../pro-unlock.html と同じ。直すときは両方そろえること**（違うのは文言・計測の金額・戻り先）。
 
    FUNCTIONS_BASE は MiseFits と同じ Firebase プロジェクト（misefits）に
    相乗りする前提。関数名だけ menufits* で分けている。
@@ -172,9 +164,9 @@ function showReady(key) {
   try {
     window.trackEvent('purchase', {
       transaction_id: sessionId,
-      value: 1480,
-      currency: 'JPY',
-      items: [{ item_id: 'menufits_pro', item_name: 'MenuFits Pro', price: 1480, quantity: 1 }]
+      value: 19,
+      currency: 'USD',
+      items: [{ item_id: 'menufits_pro_en', item_name: 'MenuFits Pro (US$)', price: 19, quantity: 1 }]
     });
     purchaseTracked = true;
     // ストレージが使える場合はリロード時の二重計上も防ぐ。
@@ -223,37 +215,37 @@ $('retryBtn').onclick = function () {
 $('copyBtn').onclick = function () {
   try {
     navigator.clipboard.writeText(licenseKey);
-    $('unlockMsg').textContent = 'キーをコピーしました。';
+    $('unlockMsg').textContent = 'Key copied.';
   } catch (e) {
-    $('unlockMsg').textContent = 'コピーできませんでした。キーを選択して手動でコピーしてください。';
+    $('unlockMsg').textContent = 'Could not copy. Select the key and copy it by hand.';
   }
 };
 
 $('unlockBtn').onclick = function () {
   var btn = $('unlockBtn');
   btn.disabled = true;
-  $('unlockMsg').textContent = '解放しています…';
+  $('unlockMsg').textContent = 'Unlocking…';
   fetch(VERIFY_URL + '?key=' + encodeURIComponent(licenseKey) + '&device=' + encodeURIComponent(deviceId()))
     .then(function (r) { return r.json().catch(function () { return {}; }); })
     .then(function (j) {
       if (j && j.valid) {
         try { localStorage.setItem(LICENSE_KEY_STORE, licenseKey); } catch (e) {}
         if (window.trackEvent) window.trackEvent('license_unlock_success', { location: 'pro_unlock' });
-        location.href = './';
+        location.href = '../?lang=en';
         return;
       }
       var reason = (j && j.reason) || 'invalid';
       if (window.trackEvent) window.trackEvent('license_unlock_fail', { location: 'pro_unlock', reason: reason });
       $('unlockMsg').textContent = reason === 'device_limit'
-        ? '解放できる台数（5台）の上限に達しています。お問い合わせいただければリセットします。'
+        ? 'This key is already active on 5 devices. Contact us and we will reset it.'
         : reason === 'revoked'
-        ? 'このキーは返金済みのため、新しい端末では解放できません。'
-        : 'このキーは確認できませんでした。時間をおいて、もう一度お試しください。';
+        ? 'This key was refunded, so it can no longer unlock new devices.'
+        : 'We could not verify this key. Please wait a moment and try again.';
       btn.disabled = false;
     })
     .catch(function () {
       if (window.trackEvent) window.trackEvent('license_unlock_fail', { location: 'pro_unlock', reason: 'network' });
-      $('unlockMsg').textContent = '通信に失敗しました。ネットワークをご確認のうえ、もう一度お試しください。';
+      $('unlockMsg').textContent = 'Could not connect. Check your network and try again.';
       btn.disabled = false;
     });
 };

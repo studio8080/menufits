@@ -33,3 +33,8 @@
 - [中華・ラーメン店のメニューの作り方](https://menufits.kokokikaku.com/menu-chuka.html): 写真を使う判断、セットの差額表示、トッピング、辛さの表記
 - [運営: ここ企画](https://kokokikaku.com/)
 - 姉妹ツール: [MiseFits — 店舗レイアウトシミュレーター](https://misefits.kokokikaku.com/)
+
+## English version
+- [MenuFits in English](https://menufits.kokokikaku.com/en/): the same editor with an English interface (`?lang=en`), aimed at Japanese restaurants outside Japan (sushi, ramen, izakaya). Japanese typefaces beside English, vertical Japanese, A4 PDF. Free to use; MenuFits Pro is a one-time US$19 (tax included) upgrade with a 14-day full refund — sold through Stripe with Link, LLC as merchant of record. First markets: Australia, Singapore, New Zealand
+- [Terms of Use & Refund Policy (English)](https://menufits.kokokikaku.com/en/terms.html): one-time license, 5 devices, full refund within 14 days; not yet offered in the EU/EEA, UK, Switzerland or UAE
+- [Privacy policy (English)](https://menufits.kokokikaku.com/en/privacy.html)
