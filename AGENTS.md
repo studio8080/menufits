@@ -45,6 +45,25 @@
   円のリンク（`PRO_PURCHASE_URL`）へは絶対に流さない**（海外の消費者に円で売ると各国の税の義務がこちらに残る）
 - 英語の静的ページは `en/` 配下。広告は出さない。`hreflang` はトップの ja ↔ en の組だけ
 
+**公開状況（2026-09-25）**
+
+フロントを `bb9c923` で push し、`/en/` の4ページと `?lang=en` が本番で生きた。
+それまでは**バックエンドと Stripe の決済リンクだけが先に生きている**状態だった
+（`/en/` が全部404、`?lang=en` も日本語のまま）。
+**関数を先にデプロイしたら、フロントを push するまでは決済リンクを外に出さないこと。**
+
+**Stripe の webhook 購読イベント（2026-09-25 確認済み）**
+
+送信先「MenuFits Pro license issuer」（`we_1UAonw3C6tqke0fyWyolaZ15`、
+エンドポイント `menufitsStripeWebhook`）は次の3件を購読している。
+**`menufits.js` が必要とするものと一致しているので、追加作業は無い。**
+
+- `checkout.session.completed`
+- `checkout.session.async_payment_succeeded`（後から確定する支払い）
+- `charge.refunded`（全額返金でキーを無効化）
+
+この3件から欠けると、返金してもキーが生き残るか、後払いの購入でキーが出ない。
+
 ### 販売開始スイッチ `PRO_LAUNCHED`
 
 `index.html` の先頭にある。**`false` にすると無料/Proの切り分けが全て無効になり、
