@@ -3478,11 +3478,11 @@ const lpHelp=$('#lpHelp'); if(lpHelp) lpHelp.onclick=e=>{ e.preventDefault(); $(
 // プライバシー・免責は privacy.html（独立ページ）に一本化した。
 // 以前はここでモーダルを開いていたが、アクセス解析のオプトアウトUIと
 // 決済まわりの記載が必要になり、内容が二重管理になるため廃止した。
-$$('[data-share]').forEach(b=>b.onclick=()=>{
+$('[data-share]').forEach(b=>b.onclick=async()=>{
   const t=b.dataset.share;
   if(t==='x') window.open('https://twitter.com/intent/tweet?text='+encodeURIComponent(SHARE_TXT)+'&url='+encodeURIComponent(SHARE_URL),'_blank','noopener');
   else if(t==='line') window.open('https://social-plugins.line.me/lineit/share?url='+encodeURIComponent(SHARE_URL),'_blank','noopener');
-  else if(t==='copy'){ try{ navigator.clipboard.writeText(SHARE_URL); toast('リンクをコピーしました'); }catch(e){ toast(SHARE_URL); } }
+  else if(t==='copy'){ try{ await navigator.clipboard.writeText(SHARE_URL); toast('リンクをコピーしました'); }catch(e){ prompt('このURLをコピーしてください',SHARE_URL); } }
 });
 // deep links: #cafe / #washoku / #bistro / #chuka / #blank open that sample、#app はエディタ。
 // #d-<デザインID>（例 #d-kinari）は、そのデザインで近いサンプルを開く。
