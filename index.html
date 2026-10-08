@@ -10,10 +10,12 @@
      **読み込み先を足したら、ここにも足すこと。** 足したら PDF 出力・写真・ライセンス解放を通しで確認する -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://www.googletagmanager.com https://www.google-analytics.com https://*.google-analytics.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://us-central1-misefits.cloudfunctions.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; object-src 'none'; base-uri 'self'; form-action 'none'">
 <meta name="referrer" content="strict-origin-when-cross-origin">
-<title>MenuFits（メニューフィッツ）｜飲食店メニューを、ひらいて、打ちかえて、PDF。</title>
-<meta name="description" content="登録不要。無料で1枚のメニューが作れる、飲食店向けのメニュー作成ツール。ブラウザだけで縦書き・写真メニュー・文字装飾に対応し、A4のPDFとして出力できます。データは端末内にのみ保存されます。">
-<meta property="og:title" content="MenuFits（メニューフィッツ）">
-<meta property="og:description" content="飲食店メニューを、ひらいて、打ちかえて、PDF。登録不要のメニュー作成ツール。">
+<title>MenuFits｜飲食店メニュー作成・A4 PDF出力｜ここ企画</title>
+<meta name="twitter:description" content="ここ企画のMenuFitsは、飲食店のメニューをブラウザで編集し、A4 PDFにできるツールです。登録不要で1枚は無料。縦書き・写真・文字装飾に対応し、メニューのデータは端末内に保存されます。">
+<meta name="twitter:title" content="MenuFits｜飲食店メニュー作成・A4 PDF出力｜ここ企画">
+<meta name="description" content="ここ企画のMenuFitsは、飲食店のメニューをブラウザで編集し、A4 PDFにできるツールです。登録不要で1枚は無料。縦書き・写真・文字装飾に対応し、メニューのデータは端末内に保存されます。">
+<meta property="og:title" content="MenuFits｜飲食店メニュー作成・A4 PDF出力｜ここ企画">
+<meta property="og:description" content="ここ企画のMenuFitsは、飲食店のメニューをブラウザで編集し、A4 PDFにできるツールです。登録不要で1枚は無料。縦書き・写真・文字装飾に対応し、メニューのデータは端末内に保存されます。">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://menufits.kokokikaku.com/">
 <meta property="og:site_name" content="MenuFits">
@@ -1671,7 +1673,11 @@ const FONT_LABEL_EN={
   if(sw){ sw.hidden=false; sw.href=EN?'./?lang=ja':'./?lang=en'; sw.textContent=EN?'日本語':'English';
     sw.lang=EN?'ja':'en'; sw.hreflang=EN?'ja':'en'; }
   if(!EN) return;
-  document.title='MenuFits — Japanese & bilingual menu maker';
+  document.title='MenuFits — Japanese & bilingual menu maker | Koko Kikaku';
+  const metaEn = 'MenuFits by Koko Kikaku is a menu maker for sushi bars, ramen shops and izakayas. Create one menu and an A4 PDF for free, with Japanese typefaces and English. No sign-up; menu data stays in your browser.';
+  ['description','twitter:description'].forEach(name=>{ const m=document.querySelector('meta[name="'+name+'"]'); if(m) m.content=metaEn; });
+  ['og:title','og:description'].forEach(name=>{ const m=document.querySelector('meta[property="'+name+'"]'); if(m) m.content=name==='og:title'?document.title:metaEn; });
+  document.querySelector('meta[name="twitter:title"]').content=document.title;
   $$('[data-en]').forEach(e=>{ e.textContent=e.dataset.en; });
   $$('[data-en-html]').forEach(e=>{ e.innerHTML=e.dataset.enHtml; });
   $$('[data-en-title]').forEach(e=>{ e.title=e.dataset.enTitle; });
