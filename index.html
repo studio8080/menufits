@@ -3441,13 +3441,22 @@ $('#helpBtn').onclick=()=>{
 /* ---------------- landing page ---------------- */
 const SHARE_URL='https://menufits.kokokikaku.com/';
 const SHARE_TXT='MenuFits — 飲食店メニューを、ひらいて、打ちかえて、PDF。登録不要の無料ツール';
-function showApp(){ document.body.classList.remove('lp-mode'); document.body.classList.add('app-mode'); fit(); }
+let menuEditorOpened=false;
+function showApp(entry='direct'){
+  document.body.classList.remove('lp-mode'); document.body.classList.add('app-mode'); fit();
+  // One opening per page load; never include a menu name, URL or user-entered content.
+  if(!menuEditorOpened){
+    menuEditorOpened=true;
+    const source=['landing','design','sample_link','design_link','app_link','english_entry','saved_menu'].includes(entry)?entry:'direct';
+    try{ trackEvent('menu_editor_open',{entry:source,ui_lang:EN?'en':'ja'}); }catch(e){}
+  }
+}
 function showLP(){ document.body.classList.remove('app-mode'); document.body.classList.add('lp-mode'); window.scrollTo(0,0); }
 const DSAMPLE={kinari:EN?'washokuJa':'washoku',shu:'chuka',noir:EN?'washoku':'bistro',split:'bistro',asia:'chuka'};
 const lpD=$('#lpDesigns');
-function openDesignSample(id){
+function openDesignSample(id,entry='design'){
   state=fresh(DSAMPLE[id]||'cafe'); state.design=id;
-  save(); syncUI(); render(); resetHistory(); showApp();
+  save(); syncUI(); render(); resetHistory(); showApp(entry);
 }
 if(lpD) DESIGNS.forEach(d=>{
   const locked=FREE_DESIGNS.indexOf(d.id)<0;
@@ -3477,7 +3486,7 @@ $$('.lpstart').forEach(b=>b.onclick=()=>{
   const msg=k==='blank' ? T('編集中の内容を消して、白紙から始めますか？','Clear your current menu and start from a blank page?') : T('前回の編集内容ではなく、サンプルから始めますか？（キャンセル＝前回の続き）','Start from the sample instead of your current menu? (Cancel keeps your menu)');
   if(k && (!localStorage.getItem(KEY) || confirm(msg)))
     { state=fresh(k); save(); syncUI(); render(); resetHistory(); }
-  showApp();
+  showApp('landing');
 });
 // 英語UIには日本語のLPを見せない。英語の入口は /en/
 $('#toTop').onclick=()=>{ if(EN) location.href='en/'; else showLP(); };
@@ -3503,7 +3512,7 @@ if(SAMPLES[H]){
   const ok = !saved ||
     confirm(T('前回の編集内容ではなく、サンプルを開きますか？（キャンセルで編集中の内容のまま）','Open the sample instead of your current menu? (Cancel keeps your menu)'));
   if(ok){ state=fresh(H); save(); syncUI(); render(); }
-  showApp();
+  showApp('sample_link');
 }
 else if(HD && DESIGNS.some(d=>d.id===HD)){
   // Proのデザインを指されたときは、無料のデザインで開いたうえで購入の案内を出す。
@@ -3515,12 +3524,12 @@ else if(HD && DESIGNS.some(d=>d.id===HD)){
   const ok = !saved ||
     confirm(T('前回の編集内容ではなく、「'+nm+'」のサンプルを開きますか？（キャンセル＝編集中の内容のまま）','Open the '+nm+' sample instead of your current menu? (Cancel keeps your menu)'));
   if(ok){
-    openDesignSample(locked ? 'edit' : HD);
+    openDesignSample(locked ? 'edit' : HD,'design_link');
     if(locked) requestProPurchase('design:'+HD,{ freeLabel:T('無料のデザインで続ける','Continue with a free design'), freeAction:()=>{} });
-  } else { showApp(); }
+  } else { showApp('design_link'); }
 }
-else if(H==='app'){ showApp(); }
-else if(EN || localStorage.getItem(KEY)) showApp();
+else if(H==='app'){ showApp('app_link'); }
+else if(EN || localStorage.getItem(KEY)) showApp(EN?'english_entry':'saved_menu');
 }
 applyDeepLink();
 // 同じページを開いたままハッシュだけ変わったとき（記事やガイドのリンクを
