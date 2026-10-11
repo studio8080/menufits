@@ -37,28 +37,33 @@ for (const privacy of ['enabled', 'optout', 'dnt']) test('editing and printing p
 
 function ads({privacy, pro, brokenTracker} = {}) {
   const events = [], listeners = {};
-  const slot = {appendChild() {}, contains: () => true, addEventListener: (name, fn) => {listeners[name] = fn;}};
+  const attrs = {};
+  const slot = {appendChild() {}, setAttribute: (name, value) => {attrs[name] = value;}, getAttribute: name => attrs[name]};
+  const link = {closest: selector => selector === 'a[href]' ? link : attrs['data-revenue'] ? slot : null};
   const template = {innerHTML: '<a>ad</a>', content: {cloneNode() {return {};}}};
   const box = {querySelector: () => template, removeChild() {}, appendChild() {}, parentNode: {removeChild() {}}};
   const c = {URL, navigator: {doNotTrack: privacy === 'dnt' ? '1' : '0'},
     localStorage: {getItem: key => key === 'menufitsWebLicense' ? (pro ? 'license' : null) : (privacy === 'optout' ? '1' : null)},
-    document: {querySelectorAll: s => s === '[data-ad]' ? [box] : [], createElement: () => slot},
+    document: {readyState: 'complete', querySelectorAll: s => s === '[data-ad]' ? [box] : [], createElement: () => slot,
+      querySelector: () => ({href:'https://menufits.kokokikaku.com/guide.html'}),
+      addEventListener: (name, fn) => {listeners[name] = fn;}},
     location: {href: 'https://menufits.kokokikaku.com/guide.html'},
     trackEvent: (...args) => {if (brokenTracker) throw Error('blocked'); events.push(args);}
   };
   c.window = c; vm.runInNewContext(read('ads.js'), c);
-  return {events, click(href) {listeners.click?.call(slot, {target: {closest: () => ({href})}});}, listeners};
+  vm.runInNewContext(read('revenue-metrics.js'), c);
+  return {events, click(href) {link.href = href; listeners.click?.({type:'click',button:0,target:link});}, listeners, attrs};
 }
-test('affiliate clicks classify providers without transmitting link parameters', () => {
+test('rendered print advertisement uses fixed labels without transmitting link parameters', () => {
   const p = ads();
   p.click('https://af.moshimo.com/af/c/click?a_id=private');
-  p.click('https://px.a8.net/svt/ejp?a8mat=private');
-  p.click('https://a8.net.example.org/');
-  assert.deepEqual(p.events.map(e => [e[0], e[1].provider]), [['affiliate_click','moshimo'],['affiliate_click','a8']]);
+  assert.deepEqual(p.events.map(e => [e[0], e[1].provider, e[1].advertiser_id]), [['affiliate_click','moshimo','print-earth']]);
   assert.ok(!JSON.stringify(p.events).includes('private'));
 });
-for (const options of [{pro: true},{privacy:'optout'},{privacy:'dnt'}]) test('excluded visitor has no affiliate handler ' + JSON.stringify(options), () => {
-  assert.equal(ads(options).listeners.click, undefined);
+for (const options of [{pro: true},{privacy:'optout'},{privacy:'dnt'}]) test('excluded visitor has no affiliate metrics ' + JSON.stringify(options), () => {
+  const p = ads(options); p.click('https://af.moshimo.com/af/c/click');
+  assert.equal(p.events.length, 0);
+  assert.equal(p.attrs['data-revenue'], undefined);
 });
 test('tracking failure does not throw from the affiliate click handler', () => {
   assert.doesNotThrow(() => ads({brokenTracker:true}).click('https://af.moshimo.com/af/c/click'));
