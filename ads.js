@@ -90,20 +90,10 @@
     var slot = document.createElement('div');
     slot.className = 'ad-slot';
     slot.appendChild(tpl.content.cloneNode(true));
-    // 既存リンクの遷移を妨げず、記事内広告のクリックを集計する。
-    // URL・クエリ・リンク本文は送信しない。
-    slot.addEventListener('click', function (event) {
-      var link = event.target.closest && event.target.closest('a[href]');
-      if (!link || !this.contains(link)) return;
-      var provider;
-      try {
-        var host = new URL(link.href, window.location.href).hostname;
-        if (/(^|\.)a8\.net$/.test(host)) provider = 'a8';
-        else if (/(^|\.)moshimo\.com$/.test(host)) provider = 'moshimo';
-        else return;
-        if (window.trackEvent) window.trackEvent('affiliate_click', {provider: provider, placement: 'article'});
-      } catch (e) {}
-    });
+    slot.setAttribute('data-revenue', 'affiliate');
+    slot.setAttribute('data-revenue-id', 'print-earth');
+    slot.setAttribute('data-revenue-provider', 'moshimo');
+    slot.setAttribute('data-revenue-placement', 'article-print');
 
     box.removeChild(tpl);
     box.appendChild(label);
