@@ -302,6 +302,12 @@ td li{margin-bottom:3px;font-size:13.5px}
   .ph .phnav a{font-size:11.5px}
   .ph .phnav a.opt{display:none}
 }
+@media(max-width:480px){
+  .ph{flex-wrap:wrap}
+  .ph .brand{flex:1}
+  .ph .sp{display:none}
+  .ph>.btn{flex-basis:100%;white-space:normal;text-align:center;line-height:1.5}
+}
 
 /* ---------- 「条件なし」の断り書き ---------- */
 .openbar{
