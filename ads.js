@@ -91,9 +91,9 @@
     slot.className = 'ad-slot';
     slot.appendChild(tpl.content.cloneNode(true));
     slot.setAttribute('data-revenue', 'affiliate');
-    slot.setAttribute('data-revenue-id', 'print-earth');
+    slot.setAttribute('data-revenue-id', box.getAttribute('data-ad-id') || 'print-earth');
     slot.setAttribute('data-revenue-provider', 'moshimo');
-    slot.setAttribute('data-revenue-placement', 'article-print');
+    slot.setAttribute('data-revenue-placement', box.getAttribute('data-ad-placement') || 'article-print');
 
     box.removeChild(tpl);
     box.appendChild(label);
