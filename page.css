@@ -279,11 +279,14 @@ td li{margin-bottom:3px;font-size:13.5px}
 .cta p{color:rgba(242,234,216,.82);font-size:13.5px;margin:0 auto 20px;max-width:34em}
 .cta .btn{background:var(--cream);color:var(--dark);border-color:var(--cream)}
 .cta .btn:hover{background:#fff;color:var(--dark)}
+.cta .cta-note{margin:16px auto 0;font-size:12.5px;line-height:1.8}
+.cta .cta-note a{color:var(--cream);font-weight:700;text-underline-offset:3px}
 
 @media (max-width:720px){
   .tpl{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
   .tpl .sw{height:76px}
   .cta{padding:26px 20px;border-radius:14px}
+  .cta .btn.big{box-sizing:border-box;width:100%;max-width:100%;padding:13px 20px;white-space:normal;line-height:1.5}
   .adbox{margin-top:18px}
 }
 
