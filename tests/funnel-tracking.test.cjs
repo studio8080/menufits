@@ -41,7 +41,8 @@ function ads({privacy, pro, brokenTracker} = {}) {
   const slot = {appendChild() {}, setAttribute: (name, value) => {attrs[name] = value;}, getAttribute: name => attrs[name]};
   const link = {closest: selector => selector === 'a[href]' ? link : attrs['data-revenue'] ? slot : null};
   const template = {innerHTML: '<a>ad</a>', content: {cloneNode() {return {};}}};
-  const box = {querySelector: () => template, removeChild() {}, appendChild() {}, parentNode: {removeChild() {}}};
+  const box = {querySelector: () => template, getAttribute: () => null,
+    removeChild() {}, appendChild() {}, parentNode: {removeChild() {}}};
   const c = {URL, navigator: {doNotTrack: privacy === 'dnt' ? '1' : '0'},
     localStorage: {getItem: key => key === 'menufitsWebLicense' ? (pro ? 'license' : null) : (privacy === 'optout' ? '1' : null)},
     document: {readyState: 'complete', querySelectorAll: s => s === '[data-ad]' ? [box] : [], createElement: () => slot,
