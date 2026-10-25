@@ -5,7 +5,7 @@ const html=fs.readFileSync(path.join(__dirname,'../index.html'),'utf8');
 const source=html.slice(html.indexOf('function parseRevisionPrice('),html.indexOf('function downloadRevisionBackup('));
 const model=vm.createContext({plain:value=>String(value||'').replace(/<[^>]*>/g,''),Intl});
 vm.runInContext(source,model);
-const doc={cur:'pre',categories:[{id:'food',name:'Food',items:[{id:'a',name:'A',price:'1,200'},{id:'b',name:'B',price:'時価'}]},{id:'drink',name:'Drinks',items:[{id:'c',name:'C',price:'12.50'}]}]};
+const doc={cur:'pre',categories:[{id:'food',title:'Food',items:[{id:'a',name:'A',price:'1,200'},{id:'b',name:'B',price:'時価'}]},{id:'drink',title:'Drinks',items:[{id:'c',name:'C',price:'12.50'}]}]};
 const options={category:'all',mode:'fixed',amount:25,step:1,round:'round'};
 test('strict price parsing does not guess labels, ranges or currency symbols',()=>{
   for(const value of ['時価','','100〜200','¥100','100円','1,20','1e3','-5','Infinity'])assert.equal(model.parseRevisionPrice(value,'pre'),null);
@@ -25,6 +25,11 @@ test('category scope and exclusions are independent and never mutate the documen
   const rows=model.revisionRows(doc,options,new Set(['0:0']));
   assert.equal(rows[0].selected,false);assert.equal(rows[1].review,true);assert.equal(rows[1].selected,false);
   assert.equal(JSON.stringify(doc),before);
+});
+test('category labels read the title field used by real menu samples',()=>{
+  const rows=model.revisionRows(doc,options);
+  assert.equal(rows[0].category,'Food');assert.equal(rows[2].category,'Drinks');
+  assert.match(html,/escHTML\(plain\(c\.title\|\|c\.name\)\)/);
 });
 test('invalid inputs fail closed and negative prices require explicit exclusion',()=>{
   for(const change of [{amount:''},{amount:NaN},{step:0},{round:'unknown'},{mode:'percent',amount:-101}])assert.throws(()=>model.revisionRows(doc,{...options,...change}));

@@ -3354,7 +3354,7 @@ function revisionRows(doc, options, excluded=new Set()){
       const decimals=step===.01&&(next%1!==0 || (comma?original.includes(','):original.includes('.')))?2:0;
       after=new Intl.NumberFormat(comma?'de-DE':'en-US',{useGrouping:grouped,minimumFractionDigits:decimals,maximumFractionDigits:2}).format(next);
     }
-    rows.push({key,ci,ii,categoryId:cat.id,itemId:item.id,name:plain(item.name),category:plain(cat.name),before:item.price,after,
+    rows.push({key,ci,ii,categoryId:cat.id,itemId:item.id,name:plain(item.name),category:plain(cat.title||cat.name),before:item.price,after,
       review:before===null,invalid:before!==null&&!valid,selected:before!==null&&!excluded.has(key),changed:after!==item.price});
   }));
   return rows;
@@ -3393,7 +3393,7 @@ function openPriceRevision(){
   openModal(`<h2>${T('価格をまとめて改定','Revise prices')}</h2>
     <p>${T('現在のメニューだけを変更します。ライブラリや他の保存スロットには反映しません。時価などの文字列価格は確認対象として残します。','Only this menu changes. The item library and other saved menus stay as they are. Text prices remain for manual review.')}</p>
     <div class="price-controls">
-      <label>${T('対象','Scope')}<select id="revisionCategory"><option value="all">${T('全品','All items')}</option>${doc.categories.map(c=>`<option value="${escHTML(c.id)}">${escHTML(plain(c.name))}</option>`).join('')}</select></label>
+      <label>${T('対象','Scope')}<select id="revisionCategory"><option value="all">${T('全品','All items')}</option>${doc.categories.map(c=>`<option value="${escHTML(c.id)}">${escHTML(plain(c.title||c.name))}</option>`).join('')}</select></label>
       <label>${T('改定方法','Change')}<select id="revisionMode"><option value="fixed">${T('固定額を加減','Add / subtract amount')}</option><option value="percent">${T('率（%）で増減','Percentage (%)')}</option></select></label>
       <label>${T('増減値（値下げは負数）','Amount (negative to reduce)')}<input id="revisionAmount" type="number" step="any" value="0"></label>
       <label>${T('端数の単位','Round to')}<select id="revisionStep"><option value="1">1</option><option value=".01">0.01</option><option value="10">10</option><option value="100">100</option></select></label>
