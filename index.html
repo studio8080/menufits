@@ -275,6 +275,16 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
   box-shadow:0 1px 2px rgba(28,25,18,.05),0 6px 14px rgba(28,25,18,.07)}
 .btn:active{transform:translateY(0)}
 .btn:disabled{opacity:.38;cursor:default;pointer-events:none}
+.price-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.price-controls label{display:flex;flex-direction:column;gap:5px;font-size:12px}
+.price-controls input,.price-controls select{width:100%;min-width:0;padding:8px;border:1px solid #b9b2a8;border-radius:5px;background:#fff;color:#282521}
+.price-table{max-height:38vh;overflow:auto;margin:12px 0}
+.price-table table{width:100%;border-collapse:collapse;font-size:13px;text-align:left}
+.price-table th,.price-table td{padding:9px;border-bottom:1px solid #d8d2c8;overflow-wrap:anywhere}
+.price-table input{width:20px;height:20px}
+.modal:has(.price-controls){max-width:800px}
+.modal:has(.price-controls) .foot{flex-wrap:wrap}
+@media(max-width:420px){.price-controls{grid-template-columns:repeat(2,minmax(0,1fr))}.price-controls label:first-child{grid-column:1/-1}.modal:has(.price-controls){padding:20px}.price-table th,.price-table td{padding:7px 4px}.price-table{max-height:30vh}}
 .histrow{margin:0 0 22px}
 .histrow .btn{padding:8px 10px;font-size:12.5px}
 .btn.primary{background:var(--ui-acc);color:#f7f5f0;border-color:var(--ui-acc);font-weight:600;letter-spacing:.08em}
@@ -1343,6 +1353,11 @@ input[type=range]{width:100%;accent-color:#1b1b1b}
       <button class="btn" id="redoBtn" disabled title="やり直す（Ctrl+Shift+Z）" data-en="Redo ↪" data-en-title="Redo (Ctrl+Shift+Z)">やり直す ↪</button>
     </div>
 
+    <div class="grp" data-pro="1">
+      <button class="btn" id="priceRevisionBtn"><span data-en="Revise prices">価格をまとめて改定</span> <i class="probadge">PRO</i></button>
+      <button class="btn" id="priceRestoreBtn" hidden data-en="Undo last price revision">直前の価格改定を取消</button>
+      <button class="btn" id="priceBackupBtn" hidden data-en="Download last revision backup">直前の改定前JSONを保存</button>
+    </div>
     <div class="grp">
       <span class="lb" data-en="01 _ Design">01 ＿ デザインを選ぶ</span>
       <div class="designs" id="designs"></div>
@@ -2661,6 +2676,7 @@ $('#stage').addEventListener('pointerdown',e=>{
 // ロック地点から必ずこれを呼ぶ。決済ページへ直行させず、触った機能の名前と
 // 値段・買い切りである点・解放される内容を見せてから送り出す。
 const PRO_FEATURE_LABELS={
+  price_revision:T('一括価格改定','Bulk price revision'),
   design:T('このデザイン','This design'), font_jp:T('この和文書体','This Japanese font'), font_en:T('この欧文書体','This Latin font'),
   pattern:T('この背景パターン','This background pattern'), deco:T('この飾り枠','This frame'),
   color:T('紙・文字・柄・枠の色調整','Custom paper, text, pattern and frame colours'), bgimg:T('背景画像','Background image'),
@@ -2670,6 +2686,7 @@ const PRO_FEATURE_LABELS={
 };
 // モーダルの一覧。触った機能に対応する行を太字にする（data-f に対応するグループ名）。
 const PRO_ITEMS=[
+  ['price_revision',T('全品・カテゴリー別の価格改定、変更前後の確認と取消','Revise all prices or a category, preview and undo')],
   ['design',  T('デザインが全11種になる（今後の追加もそのまま使えます）','All 11 designs (and any added later)')],
   ['material',T('書体378通り・背景パターン23種・飾り枠8種。紙や文字の色も個別に調整','378 font pairings, 23 patterns, 8 frames, and custom paper and text colours')],
   ['cover',   T('表紙・裏表紙を付けて、3ページ以上の冊子にできる','Front and back covers, and booklets of three pages or more')],
@@ -2677,6 +2694,7 @@ const PRO_ITEMS=[
   ['reuse',   T('スロット保存が無制限に。品目ライブラリと店舗プロフィールも','Unlimited save slots, an item library and shop profiles')],
 ];
 const PRO_GROUP={
+  price_revision:'price_revision',
   design:'design', font_jp:'material', font_en:'material', pattern:'material',
   deco:'material', color:'material', bgimg:'material',
   cover:'cover', page3:'cover', block:'layout', fieldtool:'layout',
@@ -3307,10 +3325,134 @@ function syncUI(){
   $$('#coverStyleChips .chip').forEach(b=>b.classList.toggle('on',b.dataset.v===state.coverStyle));
 }
 
+/* ---------------- Pro: local, preview-first price revision ---------------- */
+const PRICE_BACKUP_KEY=KEY+':price-revision-backup-v1';
+function parseRevisionPrice(value, currency){
+  const text=plain(value).trim(), comma=currency==='eurs';
+  const pattern=comma ? /^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/ : /^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/;
+  if(!pattern.test(text)) return null;
+  const number=Number(comma?text.replace(/\./g,'').replace(',','.'):text.replace(/,/g,''));
+  return Number.isFinite(number)&&number>=0&&number<=1e12 ? number : null;
+}
+function revisionRows(doc, options, excluded=new Set()){
+  const amount=Number(options.amount), step=Number(options.step);
+  if(String(options.amount).trim()==='' || !Number.isFinite(amount) || Math.abs(amount)>1e9 ||
+    ![.01,1,10,100].includes(step) || !['fixed','percent'].includes(options.mode) ||
+    !['round','ceil','floor'].includes(options.round) || (options.mode==='percent'&&amount < -100)) throw Error('invalid');
+  const rows=[];
+  doc.categories.forEach((cat,ci)=>cat.items.forEach((item,ii)=>{
+    if(options.category!=='all'&&options.category!==cat.id) return;
+    const key=ci+':'+ii, before=parseRevisionPrice(item.price,doc.cur);
+    const raw=before===null?null:(options.mode==='percent'?before*(1+amount/100):before+amount);
+    const quotient=raw===null?null:Math.round(raw/step*1e9)/1e9;
+    const next=quotient===null?null:Math.round(Math[options.round](quotient)*step*100)/100;
+    const valid=next!==null&&Number.isFinite(next)&&next>=0&&next<=1e12;
+    let after=item.price;
+    if(valid){
+      const original=plain(item.price), comma=doc.cur==='eurs';
+      const grouped=comma?original.includes('.'):original.includes(',');
+      const decimals=step===.01&&(next%1!==0 || (comma?original.includes(','):original.includes('.')))?2:0;
+      after=new Intl.NumberFormat(comma?'de-DE':'en-US',{useGrouping:grouped,minimumFractionDigits:decimals,maximumFractionDigits:2}).format(next);
+    }
+    rows.push({key,ci,ii,categoryId:cat.id,itemId:item.id,name:plain(item.name),category:plain(cat.name),before:item.price,after,
+      review:before===null,invalid:before!==null&&!valid,selected:before!==null&&!excluded.has(key),changed:after!==item.price});
+  }));
+  return rows;
+}
+function downloadRevisionBackup(json){
+  const url=URL.createObjectURL(new Blob([json],{type:'application/json'})), a=document.createElement('a');
+  a.href=url; a.download='menufits-before-price-revision.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function readPriceBackup(){ try{ return JSON.parse(localStorage.getItem(PRICE_BACKUP_KEY)); }catch(e){ return null; } }
+function restorePriceRevision(){
+  const backup=readPriceBackup(); if(!backup || !Array.isArray(backup.changes)) return;
+  const targets=backup.changes.map(row=>{
+    const cat=state.categories.find(c=>c.id===row.categoryId);
+    return cat&&cat.items.find(item=>item.id===row.itemId);
+  });
+  if(backup.currency!==state.cur || targets.some((item,i)=>!item||item.price!==backup.changes[i].after)){
+    toast(T('改定後に価格やメニューが変わっています。バックアップJSONを確認してください。','Prices or the menu changed since this revision. Check the backup JSON.'));
+    return;
+  }
+  const restored=JSON.parse(JSON.stringify(state));
+  backup.changes.forEach(row=>{ restored.categories.find(c=>c.id===row.categoryId).items.find(item=>item.id===row.itemId).price=row.before; });
+  try{ localStorage.setItem(KEY,JSON.stringify(restored)); }
+  catch(e){ toast(T('保存できないため取消を中止しました。バックアップJSONを保存してください。','Cannot save; undo cancelled. Download the backup JSON.')); return; }
+  flushCommit(); state=restored;
+  save(); flushCommit(); render();
+  try{ localStorage.removeItem(PRICE_BACKUP_KEY); }catch(e){}
+  $('#priceRestoreBtn').hidden=true;
+  $('#priceBackupBtn').hidden=true;
+  toast(T('価格改定を取り消しました。他の編集内容は保持しています。','Price revision undone; other edits are kept.'));
+}
+function openPriceRevision(){
+  if(proGate('price_revision')) return;
+  flushCommit();
+  const source=JSON.stringify(state), doc=JSON.parse(source), excluded=new Set();
+  let rows=[];
+  openModal(`<h2>${T('価格をまとめて改定','Revise prices')}</h2>
+    <p>${T('現在のメニューだけを変更します。ライブラリや他の保存スロットには反映しません。時価などの文字列価格は確認対象として残します。','Only this menu changes. The item library and other saved menus stay as they are. Text prices remain for manual review.')}</p>
+    <div class="price-controls">
+      <label>${T('対象','Scope')}<select id="revisionCategory"><option value="all">${T('全品','All items')}</option>${doc.categories.map(c=>`<option value="${escHTML(c.id)}">${escHTML(plain(c.name))}</option>`).join('')}</select></label>
+      <label>${T('改定方法','Change')}<select id="revisionMode"><option value="fixed">${T('固定額を加減','Add / subtract amount')}</option><option value="percent">${T('率（%）で増減','Percentage (%)')}</option></select></label>
+      <label>${T('増減値（値下げは負数）','Amount (negative to reduce)')}<input id="revisionAmount" type="number" step="any" value="0"></label>
+      <label>${T('端数の単位','Round to')}<select id="revisionStep"><option value="1">1</option><option value=".01">0.01</option><option value="10">10</option><option value="100">100</option></select></label>
+      <label>${T('端数ルール','Rounding')}<select id="revisionRound"><option value="round">${T('四捨五入','Nearest')}</option><option value="ceil">${T('切り上げ','Up')}</option><option value="floor">${T('切り捨て','Down')}</option></select></label>
+    </div><p id="revisionStatus" role="status"></p><div class="price-table"><table><thead><tr><th>${T('対象','Apply')}</th><th>${T('品目','Item')}</th><th>${T('変更前','Before')}</th><th>${T('変更後','After')}</th></tr></thead><tbody id="revisionRows"></tbody></table></div>
+    <p>${T('確定直前にブラウザへ変更前の全データをバックアップします（直前1回分）。容量不足なら変更しません。取消は直前の改定価格だけを戻します。JSONの控えも保存できます。','A full local backup is required before applying (last revision only). If storage is full, nothing changes. Undo restores only revised prices. You can also download the JSON backup.')}</p>
+    <div class="foot"><button class="btn" id="revisionDownload">${T('変更前JSONを保存','Download before JSON')}</button><button class="btn primary" id="revisionApply">${T('バックアップして確定','Back up and apply')}</button><button class="btn" id="mClose">${T('変更せず閉じる','Close without changes')}</button></div>`);
+  const preview=()=>{
+    try{
+      rows=revisionRows(doc,{category:$('#revisionCategory').value,mode:$('#revisionMode').value,amount:$('#revisionAmount').value,step:$('#revisionStep').value,round:$('#revisionRound').value},excluded);
+      $('#revisionRows').innerHTML=rows.map(row=>`<tr><td><input type="checkbox" aria-label="${escHTML(T('対象: ','Apply: ')+row.name)}" data-key="${row.key}" ${row.selected?'checked':''} ${row.review?'disabled':''}></td><td>${escHTML(row.name||T('無名','Untitled'))}<small style="display:block">${escHTML(row.category)}</small></td><td>${escHTML(plain(row.before))}</td><td>${row.review?T('要確認（文字列・空欄）','Review (text / empty)'):row.invalid?T('変更不可（範囲外）','Invalid (out of range)'):escHTML(plain(row.after))}</td></tr>`).join('');
+      const count=rows.filter(r=>r.selected&&r.changed).length;
+      $('#revisionStatus').textContent=T(count+'品を変更 / '+rows.filter(r=>r.review).length+'品は要確認',count+' changes / '+rows.filter(r=>r.review).length+' to review');
+      $('#revisionApply').disabled=!count || rows.some(r=>r.invalid&&!excluded.has(r.key));
+    }catch(e){ rows=[]; $('#revisionRows').textContent=''; $('#revisionStatus').textContent=T('増減値と端数ルールを確認してください。','Check the amount and rounding rule.'); $('#revisionApply').disabled=true; }
+  };
+  $$('.price-controls input,.price-controls select').forEach(input=>input.oninput=preview);
+  $('#revisionRows').onchange=e=>{ if(!e.target.dataset.key) return; e.target.checked?excluded.delete(e.target.dataset.key):excluded.add(e.target.dataset.key); preview(); };
+  $('#revisionDownload').onclick=()=>downloadRevisionBackup(source);
+  $('#revisionApply').onclick=()=>{
+    if(proGate('price_revision')) return;
+    if(JSON.stringify(state)!==source){ toast(T('メニューが変わったため、プレビューを開き直してください。','Menu changed. Reopen the preview.')); return; }
+    const changes=rows.filter(row=>row.selected&&row.changed);
+    if(!changes.length || rows.some(row=>row.invalid&&!excluded.has(row.key))) return;
+    const revised=JSON.parse(source);
+    changes.forEach(row=>{ revised.categories[row.ci].items[row.ii].price=row.after; });
+    try{
+      localStorage.setItem(PRICE_BACKUP_KEY,JSON.stringify({version:1,currency:doc.cur,createdAt:new Date().toISOString(),state:doc,changes}));
+      localStorage.setItem(KEY,JSON.stringify(revised));
+    }
+    catch(e){ $('#revisionStatus').textContent=T('バックアップを保存できないため中止しました。JSONを保存し、ブラウザの空き容量を確保してください。','Backup failed. No prices changed. Download JSON and free browser storage.'); return; }
+    state=revised;
+    save(); flushCommit(); render(); mask.classList.remove('on'); $('#priceRestoreBtn').hidden=false; $('#priceBackupBtn').hidden=false;
+    toast(T(changes.length+'品の価格を改定しました。直前の改定を取消できます。',changes.length+' prices revised. You can undo the last revision.'));
+  };
+  modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true');
+  modal.setAttribute('aria-label',T('価格をまとめて改定','Revise prices'));
+  modal.onkeydown=event=>{
+    if(!$('#revisionRows',modal)) return;
+    event.stopPropagation();
+    if(event.key==='Escape'){ mask.classList.remove('on'); $('#priceRevisionBtn').focus(); }
+    if(event.key==='Tab'){
+      const controls=$$('button:not(:disabled),input:not(:disabled),select',modal), first=controls[0], last=controls[controls.length-1];
+      if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+      else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+    }
+  };
+  preview(); $('#revisionAmount').focus({preventScroll:true}); modal.scrollTop=0;
+}
+$('#priceRevisionBtn').onclick=openPriceRevision;
+$('#priceRestoreBtn').onclick=restorePriceRevision;
+$('#priceRestoreBtn').hidden=!readPriceBackup();
+$('#priceBackupBtn').hidden=!readPriceBackup();
+$('#priceBackupBtn').onclick=()=>{ const backup=readPriceBackup(); if(backup&&backup.state) downloadRevisionBackup(JSON.stringify(backup.state,null,2)); };
+
 /* ---------------- modal ---------------- */
 const mask=$('#mask'), modal=$('#modal');
 mask.onclick=e=>{ if(e.target===mask) mask.classList.remove('on'); };
-function openModal(html){ modal.onclick=null; modal.innerHTML=html; mask.classList.add('on'); }
+function openModal(html){ modal.onclick=null; modal.onkeydown=null; modal.removeAttribute('aria-label'); modal.innerHTML=html; mask.classList.add('on'); }
 document.addEventListener('click',e=>{ if(e.target.id==='mClose') mask.classList.remove('on'); });
 
 $('#printBtn').onclick=()=>{
