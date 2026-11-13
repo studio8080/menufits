@@ -21,7 +21,7 @@ test('もしもアフィリエイトリンクはnofollowとsponsoredを併記す
       .map((match) => ({ page, tag: match[0] }));
   });
 
-  assert.equal(anchors.length, 8, '現在の承認済みアフィリエイトリンク8件を検査する');
+  assert.equal(anchors.length, 9, '現在の承認済みアフィリエイトリンク9件を検査する');
   for (const { page, tag } of anchors) {
     const rel = tag.match(/\brel="([^"]*)"/)?.[1].split(/\s+/) || [];
     assert.ok(rel.includes('nofollow'), `${page}: nofollowを保持する`);
