@@ -3327,6 +3327,7 @@ function syncUI(){
 
 /* ---------------- Pro: local, preview-first price revision ---------------- */
 const PRICE_BACKUP_KEY=KEY+':price-revision-backup-v1';
+let priceBackupStorageFailed=false, priceBackupFallback=null;
 function parseRevisionPrice(value, currency){
   const text=plain(value).trim(), comma=currency==='eurs';
   const pattern=comma ? /^(?:\d+|\d{1,3}(?:\.\d{3})+)(?:,\d{1,2})?$/ : /^(?:\d+|\d{1,3}(?:,\d{3})+)(?:\.\d{1,2})?$/;
@@ -3363,8 +3364,50 @@ function downloadRevisionBackup(json){
   const url=URL.createObjectURL(new Blob([json],{type:'application/json'})), a=document.createElement('a');
   a.href=url; a.download='menufits-before-price-revision.json'; a.click(); setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
-function readPriceBackup(){ try{ return JSON.parse(localStorage.getItem(PRICE_BACKUP_KEY)); }catch(e){ return null; } }
+function readPriceBackup(){
+  try{ return JSON.parse(priceBackupStorageFailed?priceBackupFallback:localStorage.getItem(PRICE_BACKUP_KEY)); }
+  catch(e){ return null; }
+}
+function canRestorePriceRevision(backup){
+  if(priceBackupStorageFailed || !backup || backup.currency!==state.cur || !Array.isArray(backup.changes) || !backup.changes.length) return false;
+  return backup.changes.every(row=>{
+    if(!row || typeof row!=='object' || !Array.isArray(state.categories)) return false;
+    const cat=state.categories.find(c=>c.id===row.categoryId), item=cat&&Array.isArray(cat.items)&&cat.items.find(i=>i.id===row.itemId);
+    return item && item.price===row.after;
+  });
+}
+function refreshPriceBackupControls(){
+  const backup=readPriceBackup();
+  $('#priceRestoreBtn').hidden=!canRestorePriceRevision(backup);
+  $('#priceBackupBtn').hidden=!backup || !backup.state;
+}
+function persistPriceRevision(revised, backup){
+  let previous;
+  try{ previous=priceBackupStorageFailed?priceBackupFallback:localStorage.getItem(PRICE_BACKUP_KEY); }
+  catch(e){ return {ok:false}; }
+  try{
+    localStorage.setItem(PRICE_BACKUP_KEY,JSON.stringify(backup));
+    localStorage.setItem(KEY,JSON.stringify(revised));
+    priceBackupStorageFailed=false; priceBackupFallback=null;
+    return {ok:true};
+  }catch(e){
+    try{
+      if(previous===null) localStorage.removeItem(PRICE_BACKUP_KEY);
+      else localStorage.setItem(PRICE_BACKUP_KEY,previous);
+      priceBackupStorageFailed=false; priceBackupFallback=null;
+      return {ok:false};
+    }catch(rollbackError){
+      // Keep the earlier JSON available for download, but never offer a false undo.
+      priceBackupStorageFailed=true; priceBackupFallback=previous;
+      return {ok:false,rollbackFailed:true};
+    }
+  }
+}
 function restorePriceRevision(){
+  if(priceBackupStorageFailed){
+    toast(T('保存領域の復旧に失敗したため、改定取消を停止しています。バックアップJSONを保存してください。','Undo is blocked because browser storage recovery failed. Download the backup JSON.'));
+    return;
+  }
   const backup=readPriceBackup(); if(!backup || !Array.isArray(backup.changes)) return;
   const targets=backup.changes.map(row=>{
     const cat=state.categories.find(c=>c.id===row.categoryId);
@@ -3420,13 +3463,23 @@ function openPriceRevision(){
     if(!changes.length || rows.some(row=>row.invalid&&!excluded.has(row.key))) return;
     const revised=JSON.parse(source);
     changes.forEach(row=>{ revised.categories[row.ci].items[row.ii].price=row.after; });
-    try{
-      localStorage.setItem(PRICE_BACKUP_KEY,JSON.stringify({version:1,currency:doc.cur,createdAt:new Date().toISOString(),state:doc,changes}));
-      localStorage.setItem(KEY,JSON.stringify(revised));
+    const persisted=persistPriceRevision(revised,{version:1,currency:doc.cur,createdAt:new Date().toISOString(),state:doc,changes});
+    if(!persisted.ok){
+      refreshPriceBackupControls();
+      const earlier=readPriceBackup();
+      if(persisted.rollbackFailed && earlier&&earlier.state){
+        $('#revisionDownload').textContent=T('前のバックアップJSONを保存','Download earlier backup JSON');
+        $('#revisionDownload').onclick=()=>downloadRevisionBackup(JSON.stringify(earlier.state,null,2));
+        $('#revisionStatus').textContent=T('価格は変更していません。前のバックアップを保存領域へ戻せなかったため、取消を停止しました。この画面を閉じる前に、前のバックアップJSONを保存してください。','No prices changed. The earlier backup could not be restored to browser storage, so undo is blocked. Download the earlier backup JSON before closing this page.');
+      }else{
+        $('#revisionStatus').textContent=persisted.rollbackFailed
+          ?T('価格は変更していません。保存領域の復旧に失敗したため、取消を停止しました。JSONを保存し、ブラウザの空き容量を確保してください。','No prices changed. Browser storage recovery failed, so undo is blocked. Download JSON and free browser storage.')
+          :T('バックアップを確認・保存できないため中止しました。価格は変更していません。JSONを保存し、ブラウザの空き容量を確保してください。','Backup could not be checked or saved. No prices changed. Download JSON and free browser storage.');
+      }
+      return;
     }
-    catch(e){ $('#revisionStatus').textContent=T('バックアップを保存できないため中止しました。JSONを保存し、ブラウザの空き容量を確保してください。','Backup failed. No prices changed. Download JSON and free browser storage.'); return; }
     state=revised;
-    save(); flushCommit(); render(); mask.classList.remove('on'); $('#priceRestoreBtn').hidden=false; $('#priceBackupBtn').hidden=false;
+    save(); flushCommit(); render(); mask.classList.remove('on'); refreshPriceBackupControls();
     toast(T(changes.length+'品の価格を改定しました。直前の改定を取消できます。',changes.length+' prices revised. You can undo the last revision.'));
   };
   modal.setAttribute('role','dialog'); modal.setAttribute('aria-modal','true');
@@ -3445,8 +3498,7 @@ function openPriceRevision(){
 }
 $('#priceRevisionBtn').onclick=openPriceRevision;
 $('#priceRestoreBtn').onclick=restorePriceRevision;
-$('#priceRestoreBtn').hidden=!readPriceBackup();
-$('#priceBackupBtn').hidden=!readPriceBackup();
+refreshPriceBackupControls();
 $('#priceBackupBtn').onclick=()=>{ const backup=readPriceBackup(); if(backup&&backup.state) downloadRevisionBackup(JSON.stringify(backup.state,null,2)); };
 
 /* ---------------- modal ---------------- */
